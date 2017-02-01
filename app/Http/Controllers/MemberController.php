@@ -132,7 +132,7 @@ class MemberController extends Controller
                     "main_position" => $main_pos,
                     "sub_position" => 'right',
                     "level" => $level,
-                    'status' => 1 
+                    'status' => 1
                 ];
                 if(empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[1]['woh_member']])->get()->toArray()))
                     DownlineLevel::create($level_data);
