@@ -18,4 +18,14 @@ class HomepageController extends Controller
     {
         return view('main_page.contact_page');
     }
+
+    public function gallery_page()
+    {
+        return view('main_page.gallery_page');
+    }
+
+    public function about_page()
+    {
+        return view('main_page.about_page');
+    }
 }

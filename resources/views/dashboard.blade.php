@@ -104,8 +104,7 @@
 
                <li @if(Request::segment(1) == "") class="active" @endif><a href="{{ action('HomepageController@index') }}">Home</a></li>
 
-               <li class="sub-menu"><a href="#">About</a><span class="fa fa-angle-down"></span>
-
+               <li class="@if(Request::segment(1) == "about") active @endif sub-menu"><a href="{{ action('HomepageController@about_page') }}">About</a><span class="fa fa-angle-down"></span>
                   <ul class="submenu">
 
                      <li><a href="#">Mission & Vision</a></li>
@@ -122,7 +121,7 @@
 
                </li>
 
-               <li><a href="#">Gallery</a></li>
+               <li @if(Request::segment(1) == "gallery") class="active" @endif><a href="{{ action('HomepageController@gallery_page') }}">Gallery</a></li>
 
                <li @if(Request::segment(1) == "contact") class="active" @endif><a href="{{ action('HomepageController@contact_page') }}">Contacts</a></li>
                @if(\Session::get('member'))
@@ -140,7 +139,7 @@
    </header>
 
 </div>
-
+@if(Request::segment(1) == "")
 <div class="thumb-box1">
 
    <div class="container">
@@ -206,7 +205,7 @@
    </div>
 
 </div>
-
+@endif
 @yield('content')
         <!--footer-->
 
@@ -296,6 +295,14 @@
          $('#create-user').click();
       });
 
+      $('#password').keypress(function (e) {
+         if (e.which == 13) {
+            $('.login').click();
+            return false;
+         }
+      });
+
+
       var dialog, form;
 
       dialog = $( "#dialog-form" ).dialog({
@@ -339,7 +346,7 @@
                      }
                   });
                },
-               'class' :'ui-button ui-corner-all ui-widget',
+               'class' :'ui-button ui-corner-all ui-widget login',
                text : "Login"
             },
             Cancel: {

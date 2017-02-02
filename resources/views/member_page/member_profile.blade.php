@@ -81,16 +81,15 @@
                 $('#create-user').click();
             });
 
-            var dialog, form ,dialog2, form2, choose_dialog;
+            var dialog, dialog2, form, form2 ,choose_dialog;
 
             dialog = $( "#dialog-form" ).dialog({
                 autoOpen: false,
-                height: 500,
-                width: 350,
+                height: 670,
+                width: 800,
                 modal: true,
                 buttons: {
                     "Save": function(){
-                        $('.with_node').tooltip().tooltip("open");
                         $('#ajax-loader').fadeIn();
                         $.ajax({
 
@@ -140,7 +139,7 @@
                     $('#form1_error').html('');
                     $('#form1_error').fadeOut();
                     form[ 0 ].reset();
-                    choose_dialog.dialog( "close" );
+                    choose_dialog.dialog('close');
                 },
                 show: {
                     effect: "blind",
@@ -184,54 +183,36 @@
                 else
                     $('#upline_selected').val({!! $member[0]->woh_member !!});
                 dialog.dialog( "close" );
+                $('#register').hide();
                 choose_dialog.dialog( "open" );
             });
 
             $('#add-account').click(function(e){
                 e.preventDefault();
-                dialog2.dialog( "open" );
+                $('#first_name').val('{!! $member[0]->first_name !!}');
+                $('#last_name').val('{!! $member[0]->last_name !!}');
+                $('#middle_name').val('{!! $member[0]->middle_name !!}');
+                $('#address').val('{!! $member[0]->address !!}');
+                $('#gender').val('{!! $member[0]->gender !!}');
+                $('#bday').val('{!! $member[0]->bday !!}');
+                $('#first_name').hide();
+                $('#last_name').hide();
+                $('#middle_name').hide();
+                $('#address').hide();
+                $('#gender').hide();
+                $('#bday').hide();
+                $('#lfname').hide();
+                $('#llname').hide();
+                $('#lmname').hide();
+                $('#laddress').hide();
+                $('#lgender').hide();
+                $('#lbday').hide();
+                dialog.dialog( "open" );
             });
 
             $('#new-account').click(function(e){
                 e.preventDefault();
                 dialog.dialog( "open" );
-            });
-
-            form2 = dialog.find( "form" ).on( "submit", function( event ) {
-                event.preventDefault();
-                addUser();
-            });
-
-            dialog2 = $( "#dialog-form2" ).dialog({
-                autoOpen: false,
-                height: 400,
-                width: 350,
-                modal: true,
-                buttons: {
-                    "Save Account": function(){
-
-                    },
-                    Cancel: function() {
-                        dialog2.dialog( "close" );
-                    }
-                },
-                close: function() {
-                    form2[ 0 ].reset();
-                    choose_dialog.dialog( "close" );
-                },
-                show: {
-                    effect: "blind",
-                    duration: 1000
-                },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                }
-            });
-
-            form2 = dialog2.find( "form" ).on( "submit", function( event ) {
-                event.preventDefault();
-                addUser();
             });
 
             choose_dialog = $( "#choose_dialog" ).dialog({
@@ -248,7 +229,84 @@
                 },
                 close: function() {
                     form[ 0 ].reset();
+                    location.reload();
                 },
+            });
+
+            $( "#my-account" ).on( "click", function(e) {
+                e.preventDefault();
+                dialog2.dialog( "open" );
+            });
+
+            dialog2 = $( "#dialog-form2" ).dialog({
+                autoOpen: false,
+                height: 508,
+                width: 800,
+                modal: true,
+                buttons: {
+                    "Update": function(){
+                        $('#ajax-loader').fadeIn();
+                        $.ajax({
+
+                            type: "POST",
+
+                            url: form2.prop('action'),
+
+                            data: form2.serialize(),
+
+                            success: function(data, NULL, jqXHR) {
+                                $('#ajax-loader').fadeOut();
+                                if(jqXHR.status === 200 ) {//redirect if  authenticated user.
+                                    $( location ).prop( 'pathname', '/member_profile');
+                                }
+                            },
+                            error: function(data) {
+                                $('#ajax-loader').fadeOut();
+                                if( data.status === 401 ) {//redirect if not authenticated user
+                                    alert("Member not found!");
+                                }
+                                if( data.status === 422 ) {
+                                    //process validation errors here.
+                                    var err_msg = '';
+                                    var res = JSON.parse(data.responseText);
+                                    for (var key in res) {
+                                        if (res.hasOwnProperty(key)) {
+                                            var obj = res[key];
+                                            for (var prop in obj) {
+                                                if (obj.hasOwnProperty(prop)) {
+                                                    err_msg += '<p>'+obj[prop] + "</p>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $('#first_name').focus();
+                                    $('#form1_error').html(err_msg);
+                                    $('#form1_error').fadeIn();
+                                }
+                            }
+                        });
+                    },
+                    Cancel: function() {
+                        dialog2.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    $('#form1_error').html('');
+                    $('#form1_error').fadeOut();
+                    form2[ 0 ].reset();
+                },
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+
+            form2 = dialog2.find( "form" ).on( "submit", function( event ) {
+                event.preventDefault();
             });
         });
     </script>
@@ -261,14 +319,14 @@
             <a class="brand" href="{{action('MemberController@member_profile')}}">WOH - Geneology</a>
             <ul class="nav_chart">
                 <li><a href="{{action('HomepageController@index')}}">Home</a></li>
-                <li><a href="{{action('MemberController@member_profile')}}">My Account</a></li>
-                <li><a href="{{action('MemberController@member_profile')}}">Withdraw</a></li>
+                <li><a href="" id="my-account">My Account</a></li>
+                <li><a href="{{action('MemberController@member_withdrawals')}}">Withdrawals</a></li>
                 <li>
                     <a href="{{action('MemberController@member_transactions')}}">Transactions & Ernings</a>
                 </li>
                 <li><a href="">Unilevel Commision</a></li>
                 <li><a href="" id="register">Add Downline</a></li>
-                <li><a href="{{action('MemberController@member_logout')}}">Logout</a></li>
+                <li><a href="{{action('MemberController@member_logout')}}" onclick="return confirm('Are you sure you want to logout?')">Logout</a></li>
             </ul>
             <div class="pull-left">
                 <div class="alert-message info" id="show-list">Show underlying list.</div>
@@ -341,35 +399,79 @@
             });
         });
 
+        $('#re-password').blur(function()
+        {
+            if($(this).val() != $('#password').val())
+            {
+                $('#form1_error').html('<p>Password does not match.</p>');
+                $('#form1_error').fadeIn();
+            }
+        });
+
+        $('#password').blur(function(){
+            if($(this).val() && $(this).val().length < 6)
+            {
+                $('#form1_error').html('<p>Password must be from 6 to 8 characters.</p>');
+                $('#form1_error').fadeIn();
+            }
+            else if($('#re-password').val() && $(this).val() != $('#re-password').val())
+            {
+                $('#form1_error').html('<p>Password does not match.</p>');
+                $('#form1_error').fadeIn();
+            }
+            else
+            {
+                $('#form1_error').html('');
+                $('#form1_error').fadeOut();
+            }
+        });
+
+        $('#username').blur(function(){
+            if($(this).val() && $(this).val().length < 6)
+            {
+                $('#form1_error').html('<p>Username must be from 6 to 8 characters.</p>');
+                $('#form1_error').fadeIn();
+            }
+            else
+            {
+                $('#form1_error').html('');
+                $('#form1_error').fadeOut();
+            }
+        });
+
+        $('#re-password').focus(function(){
+            $('#form1_error').html('');
+            $('#form1_error').fadeOut();
+        });
     });
 </script>
 <div id="dialog-form" title="Member Registration">
     {!! Form::open(['data-remote','url' => action('MemberController@post_member_add'), 'id' => 'login_form']) !!}
         <fieldset>
             <div id="form1_error" class="alert alert-danger" role="alert" style="display: none"></div>
-            <label for="first_name">First Name</label>
+            <label for="first_name" id="lfname">First Name</label>
             <input type="text" name="first_name" id="first_name" placeholder="Jane" class="text ui-widget-content ui-corner-all">
-            <label for="middle_name">Middle Name</label>
+            <label for="middle_name" id="lmname">Middle Name</label>
             <input type="text" name="middle_name" id="middle_name" placeholder="Suarez" class="text ui-widget-content ui-corner-all">
-            <label for="last_name">Last Name</label>
+            <label for="last_name" id="llname">Last Name</label>
             <input type="text" name="last_name" id="last_name" placeholder="Cruz" class="text ui-widget-content ui-corner-all">
-            <label for="address">Address</label>
+            <label for="address" id="laddress">Address</label>
             <input type="text" name="address" id="address" placeholder="Mc Briones St. Tipolo, Mandaue City Cebu" class="text ui-widget-content ui-corner-all">
-            <label for="gender">Gender</label>
-            <select name="gender" id="gender" class="text ui-widget-content ui-corner-all">
+            <label for="gender" id="lgender">Gender</label>
+            <select name="gender" id="gender" class="text ui-widget-content ui-corner-all"  style="width: 97%">
                 <option value="male">Male</option>
                 <option value="female">Female</option>
             </select>
-            <label for="bday">Birthday</label>
+            <label for="bday" id="lbday">Birthday</label>
             <input type="text" name="bday" id="bday" placeholder="1990-01-25" class="text ui-widget-content ui-corner-all">
             <label for="position">Position</label>
-            <select name="tree_position" id="tree_position" class="text ui-widget-content ui-corner-all">
+            <select name="tree_position" id="tree_position" class="text ui-widget-content ui-corner-all" style="width: 97%">
                 <option value="">Select</option>
                 <option value="left">Left</option>
                 <option value="right">Right</option>
             </select>
             <label for="downline_of">Downline</label>
-            <select name="downline_of" id="downline_of" class="text ui-widget-content ui-corner-all">
+            <select name="downline_of" id="downline_of" class="text ui-widget-content ui-corner-all" style="width: 97%">
             </select>
             <label for="sponsor">Sponsor</label>
             <input type="text" id="sponsor" value="{!! $member[0]->woh_member !!} - {!! $member[0]->username !!}" placeholder="Rudy Compayan" readonly class="text ui-widget-content ui-corner-all">
@@ -378,11 +480,11 @@
             <!--<label for="email">Email</label>
                 <input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">-->
             <label for="username">Username</label>
-            <input type="username" name="username" id="username" placeholder="username123" class="text ui-widget-content ui-corner-all">
+            <input type="username" maxlength="8" name="username" id="username" placeholder="username123" class="text ui-widget-content ui-corner-all">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
+            <input type="password" maxlength="8" name="password" id="password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <label for="re-password">Re-type Password</label>
-            <input type="password" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
+            <input type="password" maxlength="8" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <hr>
             <label for="entry_code">Entry Code</label>
             <input type="text" name="entry_code" id="entry_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
@@ -395,22 +497,29 @@
     {!! Form::close() !!}
     <button id="create-user" style="display: none">Create new user</button>
 </div>
-<div id="dialog-form2" title="Add Another Head">
-    <form>
-        <fieldset>
-            <label for="sponsor">Sponsor</label>
-            <input type="text" name="display" id="sponsor" placeholder="Rudy Compayan" readonly class="text ui-widget-content ui-corner-all">
-            <input type="hidden" name="sponsor" id="sponsor" placeholder="Rudy Compayan" value="10000x98tre" readonly class="text ui-widget-content ui-corner-all">
-            <label for="upline">Upline</label>
-            <input type="text" name="upline" id="upline" placeholder="Rudy Compayan" class="text ui-widget-content ui-corner-all">
-            <label for="entry_code">Entry Code</label>
-            <input type="text" name="entry_code" id="entry_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
-            <label for="pin_code">Pin Code</label>
-            <input type="text" name="pin_code" id="pin_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
-            <!-- Allow form submission with keyboard without duplicating the dialog button -->
-            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-    </form>
+<div id="dialog-form2" title="Account Details">
+    {!! Form::open(['data-remote','url' => action('MemberController@post_member_update'), 'id' => 'login_form']) !!}
+    <fieldset>
+        <div id="form1_error" class="alert alert-danger" role="alert" style="display: none"></div>
+        <label for="first_name" id="lfname">First Name</label>
+        <input type="text" name="first_name" id="first_name" placeholder="Jane" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->first_name !!}">
+        <label for="middle_name" id="lmname">Middle Name</label>
+        <input type="text" name="middle_name" id="middle_name" placeholder="Suarez" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->middle_name !!}">
+        <label for="last_name" id="llname">Last Name</label>
+        <input type="text" name="last_name" id="last_name" placeholder="Cruz" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->last_name !!}">
+        <label for="address" id="laddress">Address</label>
+        <input type="text" name="address" id="address" placeholder="Mc Briones St. Tipolo, Mandaue City Cebu" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->address !!}">
+        <label for="gender" id="lgender">Gender</label>
+        <select name="gender" id="gender" class="text ui-widget-content ui-corner-all"  style="width: 97%">
+            <option value="male" <?= $member[0]->gender == "male" ? "selected" : "" ?>>Male</option>
+            <option value="female" <?= $member[0]->gender == "female" ? "selected" : "" ?>>Female</option>
+        </select>
+        <label for="bday" id="lbday">Birthday</label>
+        <input type="text" name="bday" id="bday" placeholder="1990-01-25" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->bday !!}">
+        <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
+    </fieldset>
+    {!! Form::close() !!}
+    <button id="create-user" style="display: none">Create new user</button>
 </div>
 <div id="choose_dialog" title="Select Downline" style="text-align: center">
     <a id="add-account"><img src="member_page/images/plus.png" width="50"></a>

@@ -15,16 +15,17 @@ class MemberController extends Controller
 {
     public function member_profile(Request $request)
     {
-        if(!$request->session()->get('member'))
+        return $request->session()->get('woh_member');
+        if(!$request->session()->get('woh_member'))
         {
             $redirect = action('HomepageController@index');
             return redirect($redirect);
         }
         $member = new Member;
-        $member = $member->where('woh_member',$request->session()->get('member'))->get();
+        $member = $member->where('woh_member',$request->session()->get('woh_member'))->get();
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
-        return view('member_page.member_profile', compact('member', 'downlines'));
+        return view('member_page.member_profile', compact('woh_member', 'downlines'));
     }
 
     public function downline($upline)
@@ -197,8 +198,8 @@ class MemberController extends Controller
 
         if (!empty($member))
         {
-            $request->session()->put('member', $member->woh_member);
-            return response(['msg' => 'Login Successfull', 'member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
+            $request->session()->put('woh_member', $member->woh_member);
+            return response(['msg' => 'Login Successfull', 'woh_member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
             ->header('Content-Type', 'application/json');
         }
 
@@ -209,7 +210,7 @@ class MemberController extends Controller
 
     public function member_logout(Request $request)
     {
-        $request->session()->forget('member');
+        $request->session()->forget('woh_member');
         $redirect = action('HomepageController@index');
         return redirect($redirect);
     }
@@ -275,7 +276,37 @@ class MemberController extends Controller
                 ];
                 MemberTransaction::create($tran_data);
             }
-            return response(['msg' => 'Login Successfull', 'member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
+            return response(['msg' => 'Login Successfull', 'woh_member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
+            ->header('Content-Type', 'application/json');
+        }
+
+        return response(['msg' => 'Member not found!'], 401) // 401 Status Code: Forbidden, needs authentication
+        ->header('Content-Type', 'application/json');
+
+    }
+
+    public function post_member_update(Request $request)
+    {
+        $this->validate($request, [
+            "first_name" => 'required',
+            "last_name" => 'required',
+            "middle_name" => 'required',
+            "address" => 'required',
+            "bday" => 'required',
+            "gender" => 'required',
+        ]);// Returns response with validation errors if any, and 422 Status Code (Unprocessable Entity)
+
+        $data = [
+            "first_name" => $request->first_name,
+            "last_name" => $request->last_name,
+            "middle_name" => $request->middle_name,
+            "address" => $request->address,
+            "bday" => $request->bday,
+            "gender" => $request->gender,
+        ];
+        if (\DB::table('woh_member')->where('woh_member', $request->woh_member)->update($data))
+        {
+            return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
             ->header('Content-Type', 'application/json');
         }
 
@@ -287,17 +318,20 @@ class MemberController extends Controller
     public function member_transactions(Request $request)
     {
         $level_arr = [];
-        if(!$request->session()->get('member'))
+        if(!$request->session()->get('woh_member'))
         {
             $redirect = action('HomepageController@index');
             return redirect($redirect);
         }
+        $member = new Member;
+        $member = $member->where('woh_member',$request->session()->get('woh_member'))->get();
+
         $member_trans = new MemberTransaction;
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-            ->where('woh_member',$request->session()->get('member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
+            ->where('woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
 
         $level_pair = new DownlineLevel;
-        $level = $level_pair->where(['parent_member'=>$request->session()->get('member')])->max('level');
+        $level = $level_pair->where(['parent_member'=>$request->session()->get('woh_member')])->max('level');
 
         if($level > 0)
         {
@@ -305,14 +339,14 @@ class MemberController extends Controller
             {
                 $total_counts_left = $total_counts_right = 0;
                 $level_pair_main_left_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-                    ->where(['parent_member'=>$request->session()->get('member'), 'main_position'=>'left', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'left', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
                 $level_pair_main_left_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-                    ->where(['parent_member'=>$request->session()->get('member'), 'main_position'=>'left', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'left', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
 
                 $level_pair_main_right_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-                    ->where(['parent_member'=>$request->session()->get('member'), 'main_position'=>'right', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'right', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
                 $level_pair_main_right_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-                    ->where(['parent_member'=>$request->session()->get('member'), 'main_position'=>'right', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'right', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
 
                 if(!empty($level_pair_main_left_sub_left) && !empty($level_pair_main_right_sub_right))
                     $total_counts_left = count($level_pair_main_left_sub_left) > 3 ? 3 : count($level_pair_main_right_sub_right);
@@ -338,6 +372,88 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.transaction_earnings', compact('member_tran'));
+        return view('member_page.transaction_earnings', compact('member_tran', 'woh_member'));
+    }
+
+    public function member_withdrawals(Request $request)
+    {
+        $level_arr = [];
+        if(!$request->session()->get('woh_member'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        $member = new Member;
+        $member = $member->where('woh_member',$request->session()->get('woh_member'))->get();
+
+        $member_trans = new MemberTransaction;
+        $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+            ->where('woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
+
+        $level_pair = new DownlineLevel;
+        $level = $level_pair->where(['parent_member'=>$request->session()->get('woh_member')])->max('level');
+
+        if($level > 0)
+        {
+            for($x=2; $x<=$level; $x++)
+            {
+                $total_counts_left = $total_counts_right = 0;
+                $level_pair_main_left_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'left', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                $level_pair_main_left_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'left', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                $level_pair_main_right_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'right', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                $level_pair_main_right_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->where(['parent_member'=>$request->session()->get('woh_member'), 'main_position'=>'right', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                if(!empty($level_pair_main_left_sub_left) && !empty($level_pair_main_right_sub_right))
+                    $total_counts_left = count($level_pair_main_left_sub_left) > 3 ? 3 : count($level_pair_main_right_sub_right);
+
+                if(!empty($level_pair_main_left_sub_right) && !empty($level_pair_main_right_sub_left))
+                    $total_counts_right = count($level_pair_main_left_sub_right) > 3 ? 3 : count($level_pair_main_right_sub_left);
+
+                if($total_counts_left > 0 || $total_counts_right > 0)
+                {
+                    $total_counts = ($total_counts_left + $total_counts_right > 3) ? 3 : ($total_counts_left + $total_counts_right);
+                    $member_tran[] = [
+                        "woh_member_transaction" => "----------",
+                        "woh_member" => null,
+                        "woh_transaction_type" => 5,
+                        "transaction_date" => Carbon::now()->format('m/d/Y H:i A'),
+                        "tran_amount" => ($total_counts * 200),
+                        "transaction_referred" => null,
+                        "no_of_pairs" => null,
+                        "status" => 1,
+                        "transaction_type" => "Level Pair",
+                        "level" => $x
+                    ];
+                }
+            }
+        }
+        return view('member_page.member_withdrawals', compact('member_tran', 'woh_member'));
+    }
+
+    public function post_member_withdrawal(Request $request)
+    {
+        if ($request->session()->get('woh_member'))
+        {
+            $tran_data = [
+                "woh_member" => $request->woh_member,
+                "woh_transaction_type" => 1,
+                "transaction_date" => Carbon::now(),
+                "tran_amount" => $request->amount,
+                "notes" => $request->notes,
+                'status' => 2
+            ];
+            MemberTransaction::create($tran_data);
+            return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
+            ->header('Content-Type', 'application/json');
+        }
+
+        return response(['msg' => 'Member not found!'], 401) // 401 Status Code: Forbidden, needs authentication
+        ->header('Content-Type', 'application/json');
+
     }
 }

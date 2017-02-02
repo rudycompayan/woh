@@ -41,10 +41,20 @@
         .container{
             margin-left: 30px!important;
         }
+
+        .withdraw-btn{
+            float: left;
+            margin-bottom: 10px;
+            margin-left: 47px;
+            margin-top: 39px;
+            width: 100px;
+        }
         .alert-danger {
-            background-color: #f2dede;
-            border-color: #ebccd1;
-            color: #a94442;
+            background-color: #d9edf7;
+            border-color: #d9edf7;
+            color: #000000;
+            width: 93%;
+            font-size: 20px;
         }
         .alert {
             border: 1px solid transparent;
@@ -63,11 +73,17 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="member_page/jquery.jOrgChart.js"></script>
     <script>
-        var dialog2, form2;
+        var dialog2, form2, dialog3, form3;
         jQuery(document).ready(function() {
             $( "#my-account" ).on( "click", function(e) {
                 e.preventDefault();
                 dialog2.dialog( "open" );
+            });
+
+            $( "#withdraw-btn" ).on( "click", function(e) {
+                e.preventDefault();
+                $('#savings_amount').text($('#savings').text());
+                dialog3.dialog( "open" );
             });
 
             dialog2 = $( "#dialog-form2" ).dialog({
@@ -140,6 +156,109 @@
             form2 = dialog2.find( "form" ).on( "submit", function( event ) {
                 event.preventDefault();
             });
+
+            dialog3 = $( "#dialog-form3" ).dialog({
+                autoOpen: false,
+                height: 480,
+                width: 800,
+                modal: true,
+                buttons: {
+                    "Send Request": function(){
+
+                        if(!$('#amount').val())
+                        {
+                            alert('Please enter amount.');
+                            $('#amount').focus();
+                            return false;
+                        }
+
+                        var a=$('#savings_amount').text();
+                        a=a.replace(/\,/g,'');
+                        a=a.replace(/\₱/g,'');
+                        a=parseFloat(a);
+                        if($('#amount').val() > a)
+                        {
+                            alert('Amount must be less than or equal to your savings.');
+                            $('#amount').focus();
+                            return false;
+                        }
+
+                        if(!$('#notes').val())
+                        {
+                            alert('Please enter notes.');
+                            $('#notes').focus();
+                            return false;
+                        }
+
+                        $('#ajax-loader').fadeIn();
+                        $.ajax({
+
+                            type: "POST",
+
+                            url: form3.prop('action'),
+
+                            data: form3.serialize(),
+
+                            success: function(data, NULL, jqXHR) {
+                                $('#ajax-loader').fadeOut();
+                                if(jqXHR.status === 200 ) {//redirect if  authenticated user.
+                                    $( location ).prop( 'pathname', '/member_withdrawals');
+                                }
+                            },
+                            error: function(data) {
+                                $('#ajax-loader').fadeOut();
+                                if( data.status === 401 ) {//redirect if not authenticated user
+                                    alert("Member not found!");
+                                }
+                                if( data.status === 422 ) {
+                                    //process validation errors here.
+                                    var err_msg = '';
+                                    var res = JSON.parse(data.responseText);
+                                    for (var key in res) {
+                                        if (res.hasOwnProperty(key)) {
+                                            var obj = res[key];
+                                            for (var prop in obj) {
+                                                if (obj.hasOwnProperty(prop)) {
+                                                    err_msg += '<p>'+obj[prop] + "</p>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $('#first_name').focus();
+                                    $('#form1_error').html(err_msg);
+                                    $('#form1_error').fadeIn();
+                                }
+                            }
+                        });
+                    },
+                    Cancel: function() {
+                        dialog3.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    $('#form1_error').html('');
+                    $('#form1_error').fadeOut();
+                    form3[ 0 ].reset();
+                },
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+
+            form3 = dialog3.find( "form" ).on( "submit", function( event ) {
+                event.preventDefault();
+            });
+
+            $('input[name="amount"]').keyup(function(e)
+            {
+                var txtQty = $(this).val().replace(/[^0-9\.]/g,'');
+                $(this).val(txtQty);
+            });
         });
     </script>
 </head>
@@ -163,20 +282,22 @@
 </div>
 
 <div class="container" style="text-align: center; width:100%;">
+    <a href="" id="withdraw-btn"><img src="member_page/images/withdraw.png" class="withdraw-btn"></a>
     <table class="table-grid" cellspacing="0">
         <thead>
         <tr>
-            <th class='th-rows' style="width: 15%">Transaction #</th>
-            <th class='th-rows' style="width: 15%">Transaction Type</th>
-            <th class='th-rows' style="width: 15%">Level</th>
+            <th class='th-rows' style="width: 10%">Request #</th>
+            <th class='th-rows' style="width: 15%">Transaction No.</th>
+            <th class='th-rows' style="width: 15%">Check No.</th>
             <th class='th-rows' style="width: 15%">Transaction Date</th>
+            <th class='th-rows' style="width: 15%">Issuance Date</th>
             <th class='th-rows' style="width: 15%">Status</th>
             <th class='th-rows' style="width: 15%" align="right">Amount (&#8369;)</th>
         </tr>
         </thead>
         <tbody style="overflow: auto">
         <tr>
-            <td colspan="6" style="padding: 0px;">
+            <td colspan="7" style="padding: 0px;">
                 <div style="width: 100%; max-height: 500px; overflow: auto;">
                     <table class="table-grid" cellspacing="0" style="width: 100%; margin: 0px">
                         <tbody>
@@ -193,23 +314,17 @@
                                 else
                                     $earn += $mt['tran_amount'];
                                 ?>
-                                <tr style="background-color: @if($key%2==0) #efefef @else #ffffff @endif;">
-                                    <td class='rows' style="width: 15%">
-                                        @if($mt['woh_transaction_type'] == 1)
-                                            10029{!! $mt['woh_member_transaction'] !!}
-                                        @else
-                                            ----------
-                                        @endif
+                                @if($mt['woh_transaction_type'] == 1)
+                                <tr style="background-color: @if($mt['woh_member_transaction']%2==0) #efefef @else #ffffff @endif;">
+                                    <td class='rows' style="width: 10%">
+                                        10029{!! $mt['woh_member_transaction'] !!}
                                     </td>
-                                    <td class='rows' style="width: 15%">{!! $mt['transaction_type'] !!}</td>
                                     <td class='rows' style="width: 15%">
-                                        @if(isset($mt['level']))
-                                            {!! $mt['level'] !!}
-                                        @else
-                                            ----------
-                                        @endif
+                                        {!! $mt['transaction_no'] !!}
                                     </td>
+                                    <td class='rows' style="width: 15%">{!! $mt['check_number'] !!}</td>
                                     <td class='rows' style="width: 15%">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
+                                    <td class='rows' style="width: 15%">{!! $mt['issuance_date'] ? \Carbon\Carbon::parse($mt['issuance_date'])->format('m/d/Y H:i A') : '--------------------' !!}</td>
                                     <td class='rows' style="width: 15%">
                                         @if($mt['status'] == 1)
                                             Complete
@@ -221,6 +336,7 @@
                                     </td>
                                     <td class='rows' style="width: 15%" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
                                 </tr>
+                                @endif
                             @endforeach
                         @endif
                         </tbody>
@@ -229,19 +345,19 @@
             </td>
         </tr>
         <tr style="color: #2b542c">
-            <td class='rows' colspan="4"  style="color: #2b542c; border-top: 1px solid lightgray">Total Earned ==></td>
+            <td class='rows' colspan="5"  style="color: #2b542c; border-top: 1px solid lightgray">Total Earned ==></td>
             <td class='rows'  style="color: #2b542c; border-top: 1px solid lightgray"></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($earn,2) }}</b></td>
         </tr>
         <tr style="color: #761c19">
-            <td class='rows' colspan="4">Total Withdrawals ==></td>
+            <td class='rows' colspan="5">Total Withdrawals ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
         </tr>
         <tr style="color: #2a6496">
-            <td class='rows' colspan="4">Remaining Balance ==></td>
+            <td class='rows' colspan="5">Remaining Balance ==></td>
             <td class='rows'></td>
-            <td class='rows' align="right"><b>&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></td>
+            <td class='rows' align="right"><b id="savings">&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></td>
         </tr>
         </tbody>
     </table>
@@ -265,6 +381,19 @@
         </select>
         <label for="bday" id="lbday">Birthday</label>
         <input type="text" name="bday" id="bday" placeholder="1990-01-25" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->bday !!}">
+        <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
+    </fieldset>
+    {!! Form::close() !!}
+    <button id="create-user" style="display: none">Create new user</button>
+</div>
+<div id="dialog-form3" title="Withdrawal Request">
+    {!! Form::open(['data-remote','url' => action('MemberController@post_member_withdrawal'), 'id' => 'login_form']) !!}
+    <fieldset>
+        <div id="form1_error" class="alert alert-danger" role="alert">Savings: <span id="savings_amount">0.00</span> </div>
+        <label for="amount">Enter Amount</label>
+        <input type="text" name="amount" id="amount" placeholder="0.00" class="text ui-widget-content ui-corner-all">
+        <label for="notes">Notes</label>
+        <textarea name="notes" id="notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all" style="width:95%; height: 150px;"></textarea>
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
     </fieldset>
     {!! Form::close() !!}

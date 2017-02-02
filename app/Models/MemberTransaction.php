@@ -15,6 +15,10 @@ class MemberTransaction extends Model
         'transaction_date',
         'tran_amount',
         "transaction_referred",
+        "transaction_no",
+        "check_number",
+        "issuance_date",
+        "notes",
         "status"
     ];
 }
