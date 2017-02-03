@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DownlineLevel;
 use App\Models\Member;
 use App\Models\MemberTransaction;
+use App\Models\ShortCodes;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,6 @@ class MemberController extends Controller
 {
     public function member_profile(Request $request)
     {
-        return $request->session()->get('woh_member');
         if(!$request->session()->get('woh_member'))
         {
             $redirect = action('HomepageController@index');
@@ -25,7 +25,7 @@ class MemberController extends Controller
         $member = $member->where('woh_member',$request->session()->get('woh_member'))->get();
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
-        return view('member_page.member_profile', compact('woh_member', 'downlines'));
+        return view('member_page.member_profile', compact('member', 'downlines'));
     }
 
     public function downline($upline)
@@ -235,6 +235,12 @@ class MemberController extends Controller
             "pin_code" =>'required',
         ]);// Returns response with validation errors if any, and 422 Status Code (Unprocessable Entity)
 
+        if(empty(ShortCodes::where(['type'=>1, 'code'=>$request->entry_code])->get()->toArray()))
+            return response(['msg' => 'Entry code not found!'], 401)->header('Content-Type', 'application/json');
+
+        if(empty(ShortCodes::where(['type'=>2, 'code'=>$request->pin_code])->get()->toArray()))
+            return response(['msg' => 'Pin code not found!'], 401)->header('Content-Type', 'application/json');
+
         $data = [
             "first_name" => $request->first_name,
             "last_name" => $request->last_name,
@@ -252,6 +258,8 @@ class MemberController extends Controller
         $member = Member::create($data);
         if (!empty($member))
         {
+            \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $request->entry_code])->update(['status'=>1]);
+            \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $request->pin_code])->update(['status'=>1]);
             $tran_data = [
                 "woh_member" => $request->sponsor,
                 "woh_transaction_type" => 2,
@@ -372,7 +380,7 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.transaction_earnings', compact('member_tran', 'woh_member'));
+        return view('member_page.transaction_earnings', compact('member_tran', 'member'));
     }
 
     public function member_withdrawals(Request $request)
@@ -432,7 +440,7 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.member_withdrawals', compact('member_tran', 'woh_member'));
+        return view('member_page.member_withdrawals', compact('member_tran', 'member'));
     }
 
     public function post_member_withdrawal(Request $request)

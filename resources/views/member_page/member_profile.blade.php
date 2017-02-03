@@ -108,7 +108,10 @@
                             error: function(data) {
                                 $('#ajax-loader').fadeOut();
                                 if( data.status === 401 ) {//redirect if not authenticated user
-                                    alert("Member not found!");
+                                    var res = JSON.parse(data.responseText);
+                                    $('#first_name').focus();
+                                    $('#form1_error').html(res.msg);
+                                    $('#form1_error').fadeIn();
                                 }
                                 if( data.status === 422 ) {
                                     //process validation errors here.

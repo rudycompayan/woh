@@ -154,7 +154,7 @@
 
                <div class="extra-wrap">
 
-                  <a href="http://shopping.woh-hypermart.com/">Shopping</a>
+                  <a href="http://shopping.wohhypermart.com/">Shopping</a>
 
                   <p>Buy products online</p>
 

@@ -309,7 +309,7 @@
                             ?>
                             @foreach($member_tran as $key => $mt)
                                 <?php
-                                if($mt['woh_transaction_type'] == 1)
+                                if($mt['woh_transaction_type'] == 1 && $mt['status'] != 3)
                                     $withdrawals += $mt['tran_amount'];
                                 else
                                     $earn += $mt['tran_amount'];
@@ -331,7 +331,7 @@
                                         @elseif($mt['status'] == 2)
                                             Pending
                                         @else
-                                            Disapproved
+                                            Cancelled
                                         @endif
                                     </td>
                                     <td class='rows' style="width: 15%" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
