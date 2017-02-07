@@ -29,13 +29,13 @@
         }
         .table-grid{
             width:90%; background-color: #ffffff; color: #000000; text-align: left;
-            border:1px solid #ffffff; margin-left: 3%; margin-top: 50px; font-size: 16px;
+            border:1px solid #ffffff; margin-left: 3%; margin-top: 50px; font-size: 12px;
         }
         .rows{
             border-bottom:1px solid lightgray; padding: 7px 5px;
         }
         .th-rows{
-            border-bottom:1px solid lightgray; padding: 7px 5px; font-size: 18px;
+            border-bottom:1px solid lightgray; padding: 7px 5px; font-size: 14px;
         }
 
         .container{
@@ -62,6 +62,35 @@
             margin-bottom: 20px;
             padding: 15px;
         }
+
+        .totals {
+            background: #2b542c none repeat scroll 0 0!important;
+            border-radius: 5px!important;
+            color: #fff!important;
+            padding: 3px 7px!important;
+        }
+
+        .totals-w {
+            background: #761c19 none repeat scroll 0 0!important;
+            border-radius: 5px!important;
+            color: #fff!important;
+            padding: 3px 7px!important;
+        }
+
+        .totals-t {
+            background: #761c19 none repeat scroll 0 0!important;
+            border-radius: 5px!important;
+            color: #fff!important;
+            padding: 3px 7px!important;
+        }
+
+        .totals-b {
+            background: #2a6496 none repeat scroll 0 0!important;
+            border-radius: 5px!important;
+            color: #fff!important;
+            padding: 3px 7px!important;
+        }
+
     </style>
 
     <script type="text/javascript" src="member_page/prettify.js"></script>
@@ -83,7 +112,14 @@
             $( "#withdraw-btn" ).on( "click", function(e) {
                 e.preventDefault();
                 $('#savings_amount').text($('#savings').text());
-                dialog3.dialog( "open" );
+                @if($member[0]->status == 0)
+                var result = confirm("You are a CD account member. Your transaction will be deducted 50% of the amount withdrawn. Continue?");
+                if (result) {
+                    dialog3.dialog("open");
+                }
+                @else
+                    dialog3.dialog("open");
+                @endif
             });
 
             dialog2 = $( "#dialog-form2" ).dialog({
@@ -283,21 +319,25 @@
 
 <div class="container" style="text-align: center; width:100%;">
     <a href="" id="withdraw-btn"><img src="member_page/images/withdraw.png" class="withdraw-btn"></a>
-    <table class="table-grid" cellspacing="0">
+    <table class="table-grid" cellspacing="0" style="font: 12px">
         <thead>
         <tr>
-            <th class='th-rows' style="width: 10%">Request #</th>
+            <th class='th-rows' style="width: 5%">Req. #</th>
             <th class='th-rows' style="width: 15%">Transaction No.</th>
-            <th class='th-rows' style="width: 15%">Check No.</th>
-            <th class='th-rows' style="width: 15%">Transaction Date</th>
-            <th class='th-rows' style="width: 15%">Issuance Date</th>
-            <th class='th-rows' style="width: 15%">Status</th>
-            <th class='th-rows' style="width: 15%" align="right">Amount (&#8369;)</th>
+            <th class='th-rows' style="width: 10%">Check No.</th>
+            <th class='th-rows' style="width: 12%">Transaction Date</th>
+            <th class='th-rows' style="width: 12%">Issuance Date</th>
+            <th class='th-rows' style="width: 5%">Status</th>
+            <th class='th-rows' style="width: 10%">Admin Notes</th>
+            <th class='th-rows' style="width: 10%" align="right">(&#8369;) Principal Amt.</th>
+            <th class='th-rows' style="width: 5%" align="right">(&#8369;) Tax </th>
+            <th class='th-rows' style="width: 6%" align="right">(&#8369;) CD Payment </th>
+            <th class='th-rows' style="width: 10%" align="right">(&#8369;) Check Amt. </th>
         </tr>
         </thead>
         <tbody style="overflow: auto">
         <tr>
-            <td colspan="7" style="padding: 0px;">
+            <td colspan="11" style="padding: 0px;">
                 <div style="width: 100%; max-height: 500px; overflow: auto;">
                     <table class="table-grid" cellspacing="0" style="width: 100%; margin: 0px">
                         <tbody>
@@ -305,27 +345,34 @@
                             <?php
                             $earn = 0;
                             $withdrawals = 0;
+                            $tax = 0;
+                            $cd_deduction = 0;
                             krsort($member_tran);
                             ?>
                             @foreach($member_tran as $key => $mt)
                                 <?php
                                 if($mt['woh_transaction_type'] == 1 && $mt['status'] != 3)
                                     $withdrawals += $mt['tran_amount'];
-                                else
+                                elseif($mt['woh_transaction_type'] != 1)
                                     $earn += $mt['tran_amount'];
+                                if($mt['woh_transaction_type'] == 1 && $mt['status'] != 3)
+                                {
+                                    $tax += !empty($mt['tax']) ? $mt['tax'] : 0;
+                                    $cd_deduction += !empty($mt['cd_payment']) ? $mt['cd_payment'] : 0;
+                                }
                                 ?>
                                 @if($mt['woh_transaction_type'] == 1)
                                 <tr style="background-color: @if($mt['woh_member_transaction']%2==0) #efefef @else #ffffff @endif;">
-                                    <td class='rows' style="width: 10%">
-                                        10029{!! $mt['woh_member_transaction'] !!}
+                                    <td class='rows' style="width: 5%; @if($mt['status']==3) text-decoration: line-through; @endif">
+                                        {!! $mt['woh_member_transaction'] !!}
                                     </td>
                                     <td class='rows' style="width: 15%">
                                         {!! $mt['transaction_no'] !!}
                                     </td>
-                                    <td class='rows' style="width: 15%">{!! $mt['check_number'] !!}</td>
-                                    <td class='rows' style="width: 15%">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
-                                    <td class='rows' style="width: 15%">{!! $mt['issuance_date'] ? \Carbon\Carbon::parse($mt['issuance_date'])->format('m/d/Y H:i A') : '--------------------' !!}</td>
-                                    <td class='rows' style="width: 15%">
+                                    <td class='rows' style="width: 10%">{!! $mt['check_number'] !!}</td>
+                                    <td class='rows' style="width: 12%; @if($mt['status']==3) text-decoration: line-through; @endif">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
+                                    <td class='rows' style="width: 12%">{!! $mt['issuance_date'] ? \Carbon\Carbon::parse($mt['issuance_date'])->format('m/d/Y H:i A') : '--------------------' !!}</td>
+                                    <td class='rows' style="width: 5%">
                                         @if($mt['status'] == 1)
                                             Complete
                                         @elseif($mt['status'] == 2)
@@ -334,7 +381,11 @@
                                             Cancelled
                                         @endif
                                     </td>
-                                    <td class='rows' style="width: 15%" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
+                                    <td class='rows' style="width: 10%">{!! $mt['admin_notes'] !!}</td>
+                                    <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
+                                    <td class='rows' style="width: 5%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['tax']) ? $mt['tax'] : 0,2) !!}</td>
+                                    <td class='rows' style="width: 6%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['cd_payment']) ? $mt['cd_payment'] : 0,2) !!}</td>
+                                    <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format((($mt['tran_amount']/2)-$mt['tax']),2) !!}</td>
                                 </tr>
                                 @endif
                             @endforeach
@@ -344,20 +395,39 @@
                 </div>
             </td>
         </tr>
-        <tr style="color: #2b542c">
-            <td class='rows' colspan="5"  style="color: #2b542c; border-top: 1px solid lightgray">Total Earned ==></td>
+        <tr style="color: #2b542c; background-color: #efefef">
+            <td class='rows' colspan="7"  style="color: #2b542c; border-top: 1px solid lightgray">Totals ==></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($tax,2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($cd_deduction,2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format((($withdrawals/2)-$tax),2) }}</b></td>
+        </tr>
+        <tr style="color: #2b542c;">
+            <td class='rows' colspan="9"  style="color: #2b542c; border-top: 1px solid lightgray">Current Balance ==></td>
             <td class='rows'  style="color: #2b542c; border-top: 1px solid lightgray"></td>
-            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($earn,2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><span class="totals"><b>&#8369; {{ number_format($earn,2) }}</b></span></td>
         </tr>
-        <tr style="color: #761c19">
-            <td class='rows' colspan="5">Total Withdrawals ==></td>
+        <tr style="color: #761c19; background-color: #efefef">
+            <td class='rows' colspan="9">Total Withdrawals ==></td>
             <td class='rows'></td>
-            <td class='rows' align="right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
+            <td class='rows' align="right"><span class="totals-w"><b>&#8369; {{ number_format(($withdrawals-$tax),2) }}</b></span></td>
         </tr>
-        <tr style="color: #2a6496">
-            <td class='rows' colspan="5">Remaining Balance ==></td>
+        <tr style="color: #761c19;">
+            <td class='rows' colspan="9">Total Tax ==></td>
             <td class='rows'></td>
-            <td class='rows' align="right"><b id="savings">&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></td>
+            <td class='rows' align="right"><span class="totals-t"><b>&#8369; {{ number_format($tax,2) }}</b></span></td>
+        </tr>
+        @if(!empty($member_credit))
+        <tr style="color: #761c19;">
+            <td class='rows' colspan="9">CD Account Credit ==></td>
+            <td class='rows'></td>
+            <td class='rows' align="right"><span class="totals-t"><b>&#8369; {{ number_format($member_credit[0]['credit_amount'],2) }}</b></span></td>
+        </tr>
+        @endif
+        <tr style="color: #2a6496;  background-color: #efefef">
+            <td class='rows' colspan="9">Remaining Balance ==></td>
+            <td class='rows'></td>
+            <td class='rows' align="right"><span class="totals-b"><b id="savings">&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></span></td>
         </tr>
         </tbody>
     </table>

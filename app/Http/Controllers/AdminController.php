@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Member;
+use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
+use Carbon\Carbon;
 use Faker\Provider\Barcode;
 use Illuminate\Http\Request;
 
@@ -66,7 +69,9 @@ class AdminController extends Controller
         $member_trans = new MemberTransaction;
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
             ->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_transaction.woh_member')
-            ->where(['woh_member_transaction.woh_transaction_type'=>1, 'status'=>2])->orderBy('woh_member_transaction','desc')->get()->toArray();
+            ->where(['woh_member_transaction.woh_transaction_type'=>1, 'woh_member_transaction.status'=>2])->orderBy('woh_member_transaction','desc')->get([
+                'first_name','last_name', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
+            ])->toArray();
         return view('admin_page2.withdrawal_request', compact('member_tran'));
     }
 
@@ -158,11 +163,56 @@ class AdminController extends Controller
                 'issuance_date' => \Carbon\Carbon::parse($request->issuance_date)->format('Y-m-d H:i:s'),
                 'status' => 1
             ];
+
+            $member_tran = MemberTransaction::where('woh_member_transaction',$request->woh_member_transaction)->get(['woh_member', 'tran_amount'])->toArray();
+            $member = new Member;
+            $member = $member->where('woh_member',$member_tran[0]['woh_member'])->get()->toArray();
+            if($member[0]['status'] == 0)
+            {
+                $member_credit = MemberCredit::where('woh_member',$member[0]['woh_member'])->get()->toArray();
+                if($member_credit[0]['credit_amount'] > 0)
+                    \DB::table('woh_member_credit')->where(['woh_member'=>$member[0]['woh_member']])->update(['credit_amount'=>($member_credit[0]['credit_amount'] - ($member_tran[0]['tran_amount']/2))]);
+
+                $member_credit2 = MemberCredit::where('woh_member',$member[0]['woh_member'])->get()->toArray();
+                if(!empty($member_credit2) && $member_credit2[0]['credit_amount'] == 0)
+                {
+                    \DB::table('woh_member_credit')->where('woh_member_credit', $member_credit2[0]['woh_member_credit'])->delete();
+                    \DB::table('woh_member')->where('woh_member', $member[0]['woh_member'])->update(['status'=>1,'picture'=>'online.png']);
+                    $tran_data = [
+                        "woh_member" => $member[0]['sponsor'],
+                        "woh_transaction_type" => 2,
+                        "transaction_date" => Carbon::now(),
+                        "tran_amount" => 200,
+                        "transaction_referred" => $member[0]['woh_member'],
+                        'status' => 1
+                    ];
+                    MemberTransaction::create($tran_data);
+
+                    $pair_dl = new Member;
+                    $pair_dl = $pair_dl->where('downline_of',$member[0]['downline_of'])->get()->toArray();
+                    if($pair_dl && count($pair_dl) == 2)
+                    {
+                        $tran_data = [
+                            "woh_member" => $member[0]['downline_of'],
+                            "woh_transaction_type" => 3,
+                            "transaction_date" => Carbon::now(),
+                            "tran_amount" => 200,
+                            "transaction_referred" => null,
+                            'status' => 1
+                        ];
+                        MemberTransaction::create($tran_data);
+                    }
+                }
+            }
         }
         else
         {
+            $this->validate($request, [
+                "admin_notes" => 'required'
+            ]);// Returns response with validation errors if any, and 422 Status Code (Unprocessable Entity)
             $data = [
-                'status' => 3
+                'status' => 3,
+                "admin_notes" => $request->admin_notes
             ];
         }
         \DB::table('woh_member_transaction')->where('woh_member_transaction', $request->woh_member_transaction)->update($data);

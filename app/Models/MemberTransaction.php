@@ -19,6 +19,9 @@ class MemberTransaction extends Model
         "check_number",
         "issuance_date",
         "notes",
-        "status"
+        "tax",
+        "cd_payment",
+        "status",
+        "admin_notes"
     ];
 }

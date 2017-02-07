@@ -16,19 +16,19 @@
                                 <li style="width: 100%;  border: none; margin-bottom: 0px">
                                     <div class="news-item-detail">
                                         <label href="#" class="news-item-title" target="_blank">GC To</label>
-                                        <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
+                                        <p class="news-item-preview"><input type="text" name="gc_to" style="width: 86%;"></p>
                                     </div>
                                 </li>
                                 <li style="width: 100%; border: none; margin-bottom: 0px;">
                                     <div class="news-item-detail">
                                         <label href="#" class="news-item-title" target="_blank">GC Name</label>
-                                        <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
+                                        <p class="news-item-preview"><input type="text" name="gc_name" style="width: 86%;"></p>
                                     </div>
                                 </li>
                                 <li style="width: 100%; border: none; margin-bottom: 0px">
                                     <div class="news-item-detail">
                                         <label href="#" class="news-item-title" target="_blank">GC Description</label>
-                                        <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
+                                        <p class="news-item-preview"><input type="text" name="gc_desc" style="width: 86%;"></p>
                                     </div>
                                 </li>
                                 <li style="width: 100%; border: none; margin-bottom: 0px">
@@ -40,13 +40,7 @@
                                 <li style="width: 100%; border: none; margin-bottom: 0px">
                                     <div class="news-item-detail">
                                         <label href="#" class="news-item-title" target="_blank">Date Created</label>
-                                        <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
-                                    </div>
-                                </li>
-                                <li style="width: 100%;  border: none; margin-bottom: 0px">
-                                    <div class="news-item-detail">
-                                        <label href="#" class="news-item-title" target="_blank">Expiration Date</label>
-                                        <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
+                                        <p class="news-item-preview"><input type="text" name="gc_created" style="width: 86%;"></p>
                                     </div>
                                 </li>
                                 <li style="width: 100%">

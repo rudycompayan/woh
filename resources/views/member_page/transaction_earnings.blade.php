@@ -189,19 +189,20 @@
                             @foreach($member_tran as $key => $mt)
                                 <?php
                                 if($mt['woh_transaction_type'] == 1)
-                                    $withdrawals += $mt['tran_amount'];
-                                else
+                                    if($mt['status'] !=3)
+                                        $withdrawals += $mt['tran_amount'];
+                                if($mt['woh_transaction_type'] != 1)
                                     $earn += $mt['tran_amount'];
                                 ?>
                                 <tr style="background-color: @if($key%2==0) #efefef @else #ffffff @endif;">
-                                    <td class='rows' style="width: 15%">
+                                    <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif">
                                         @if($mt['woh_transaction_type'] == 1)
-                                            10029{!! $mt['woh_member_transaction'] !!}
+                                            {!! $mt['woh_member_transaction'] !!}
                                         @else
                                             ----------
                                         @endif
                                     </td>
-                                    <td class='rows' style="width: 15%">{!! $mt['transaction_type'] !!}</td>
+                                    <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif">{!! $mt['transaction_type'] !!}</td>
                                     <td class='rows' style="width: 15%">
                                         @if(isset($mt['level']))
                                             {!! $mt['level'] !!}
@@ -209,17 +210,17 @@
                                             ----------
                                         @endif
                                     </td>
-                                    <td class='rows' style="width: 15%">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
+                                    <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
                                     <td class='rows' style="width: 15%">
                                         @if($mt['status'] == 1)
                                             Complete
                                         @elseif($mt['status'] == 2)
                                             Pending
                                         @else
-                                            Disapproved
+                                            Cancelled
                                         @endif
                                     </td>
-                                    <td class='rows' style="width: 15%" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
+                                    <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -238,6 +239,13 @@
             <td class='rows'></td>
             <td class='rows' align="right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
         </tr>
+        @if(!empty($member_credit))
+        <tr style="color: #761c19">
+            <td class='rows' colspan="4">CD Account Credit ==></td>
+            <td class='rows'></td>
+            <td class='rows' align="right"><b>&#8369; {{ number_format($member_credit[0]['credit_amount'],2) }}</b></td>
+        </tr>
+        @endif
         <tr style="color: #2a6496">
             <td class='rows' colspan="4">Remaining Balance ==></td>
             <td class='rows'></td>

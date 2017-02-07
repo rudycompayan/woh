@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DownlineLevel;
 use App\Models\Member;
+use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
 use Carbon\Carbon;
@@ -52,7 +53,7 @@ class MemberController extends Controller
                         "level" => 1,
                         'status' => 1
                     ];
-                    if(empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$dl['woh_member']])->get()->toArray()))
+                    if($dl['status'] == 1 && empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$dl['woh_member']])->get()->toArray()))
                         DownlineLevel::create($level_data);
                     $downline_li .= $this->downline_all($dl['woh_member'], 1, $key == 0 ? 'left' : 'right', $upline);
                     $downline_li .= "\n</li>";
@@ -72,7 +73,7 @@ class MemberController extends Controller
                         "level" => 1,
                         'status' => 1
                     ];
-                    if(empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
+                    if($downline[0]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
                         DownlineLevel::create($level_data);
                     $downline_li .= $this->downline_all($downline[0]['woh_member'],1, 'right', $upline);
                     $downline_li .= "</li>";
@@ -88,7 +89,7 @@ class MemberController extends Controller
                         "level" => 1,
                         'status' => 1
                     ];
-                    if(empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
+                    if($downline[0]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$upline, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
                         DownlineLevel::create($level_data);
                     $downline_li .= $this->downline_all($downline[0]['woh_member'], 1, 'left', $upline);
                     $downline_li .= "</li>";
@@ -122,7 +123,7 @@ class MemberController extends Controller
                     "level" => $level,
                     'status' => 1
                 ];
-                if(empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
+                if($downline[0]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
                     DownlineLevel::create($level_data);
                 $box .= $this->downline_all($downline[0]['woh_member'], $level, $main_pos, $sponsor);
                 $box .= "</li>";
@@ -135,7 +136,7 @@ class MemberController extends Controller
                     "level" => $level,
                     'status' => 1
                 ];
-                if(empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[1]['woh_member']])->get()->toArray()))
+                if($downline[1]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[1]['woh_member']])->get()->toArray()))
                     DownlineLevel::create($level_data);
                 $box .= $this->downline_all($downline[1]['woh_member'], $level, $main_pos, $sponsor);
                 $box .= "</li>";
@@ -154,7 +155,7 @@ class MemberController extends Controller
                         "level" => $level,
                         'status' => 1
                     ];
-                    if(empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
+                    if($downline[0]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
                         DownlineLevel::create($level_data);
                     $box .= $this->downline_all($downline[0]['woh_member'], $level, $main_pos, $sponsor);
                     $box .= "</li>";
@@ -170,7 +171,7 @@ class MemberController extends Controller
                         "level" => $level,
                         'status' => 1
                     ];
-                    if(empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
+                    if($downline[0]['status']==1 && empty(DownlineLevel::where(['parent_member'=>$sponsor, 'downline_member'=>$downline[0]['woh_member']])->get()->toArray()))
                         DownlineLevel::create($level_data);
                     $box .= $this->downline_all($downline[0]['woh_member'], $level, $main_pos, $sponsor);
                     $box .= "</li>";
@@ -231,12 +232,23 @@ class MemberController extends Controller
             "username" => 'required',
             "password" =>'required',
             "re-password" =>'required',
-            "entry_code" =>'required',
+            "account_type" => 'required',
             "pin_code" =>'required',
         ]);// Returns response with validation errors if any, and 422 Status Code (Unprocessable Entity)
 
-        if(empty(ShortCodes::where(['type'=>1, 'code'=>$request->entry_code])->get()->toArray()))
-            return response(['msg' => 'Entry code not found!'], 401)->header('Content-Type', 'application/json');
+        if($request->account_type == 'entry_code')
+        {
+            $this->validate($request, ["entry_code" =>'required']);
+            if(empty(ShortCodes::where(['type'=>1, 'code'=>$request->entry_code])->get()->toArray()))
+                return response(['msg' => 'Entry code not found!'], 401)->header('Content-Type', 'application/json');
+        }
+
+        if($request->account_type == 'cd_code')
+        {
+            $this->validate($request, ["cd_code" => 'required']);
+            if(empty(ShortCodes::where(['type'=>3, 'code'=>$request->cd_code])->get()->toArray()))
+                return response(['msg' => 'CD code not found!'], 401)->header('Content-Type', 'application/json');
+        }
 
         if(empty(ShortCodes::where(['type'=>2, 'code'=>$request->pin_code])->get()->toArray()))
             return response(['msg' => 'Pin code not found!'], 401)->header('Content-Type', 'application/json');
@@ -258,31 +270,46 @@ class MemberController extends Controller
         $member = Member::create($data);
         if (!empty($member))
         {
-            \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $request->entry_code])->update(['status'=>1]);
+            if($request->account_type == 'entry_code')
+                \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $request->entry_code])->update(['status'=>1]);
             \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $request->pin_code])->update(['status'=>1]);
-            $tran_data = [
-                "woh_member" => $request->sponsor,
-                "woh_transaction_type" => 2,
-                "transaction_date" => Carbon::now(),
-                "tran_amount" => 200,
-                "transaction_referred" => $member->woh_member,
-                'status' => 1
-            ];
-            MemberTransaction::create($tran_data);
-
-            $pair_dl = new Member;
-            $pair_dl = $pair_dl->where('downline_of',$request->downline_of)->get()->toArray();
-            if($pair_dl && count($pair_dl) == 2)
+            if($request->account_type == 'cd_code')
+                \DB::table('woh_short_codes')->where(['type'=>3, 'code' => $request->pin_code])->update(['status'=>1]);
+            if($request->account_type == 'entry_code')
             {
                 $tran_data = [
-                    "woh_member" => $request->downline_of,
-                    "woh_transaction_type" => 3,
+                    "woh_member" => $request->sponsor,
+                    "woh_transaction_type" => 2,
                     "transaction_date" => Carbon::now(),
                     "tran_amount" => 200,
-                    "transaction_referred" => null,
+                    "transaction_referred" => $member->woh_member,
                     'status' => 1
                 ];
                 MemberTransaction::create($tran_data);
+
+                $pair_dl = new Member;
+                $pair_dl = $pair_dl->where('downline_of',$request->downline_of)->get()->toArray();
+                if($pair_dl && count($pair_dl) == 2)
+                {
+                    $tran_data = [
+                        "woh_member" => $request->downline_of,
+                        "woh_transaction_type" => 3,
+                        "transaction_date" => Carbon::now(),
+                        "tran_amount" => 200,
+                        "transaction_referred" => null,
+                        'status' => 1
+                    ];
+                    MemberTransaction::create($tran_data);
+                }
+            }
+            else
+            {
+                $tran_data = [
+                    "woh_member" => $member->woh_member,
+                    "credit_date" => Carbon::now(),
+                    "credit_amount" => 2988,
+                ];
+                MemberCredit::create($tran_data);
             }
             return response(['msg' => 'Login Successfull', 'woh_member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
             ->header('Content-Type', 'application/json');
@@ -338,6 +365,8 @@ class MemberController extends Controller
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
             ->where('woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
 
+        $member_credit = MemberCredit::where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
+
         $level_pair = new DownlineLevel;
         $level = $level_pair->where(['parent_member'=>$request->session()->get('woh_member')])->max('level');
 
@@ -380,7 +409,7 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.transaction_earnings', compact('member_tran', 'member'));
+        return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit'));
     }
 
     public function member_withdrawals(Request $request)
@@ -398,6 +427,8 @@ class MemberController extends Controller
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
             ->where('woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
 
+        $member_credit = MemberCredit::where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
+
         $level_pair = new DownlineLevel;
         $level = $level_pair->where(['parent_member'=>$request->session()->get('woh_member')])->max('level');
 
@@ -440,18 +471,22 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.member_withdrawals', compact('member_tran', 'member'));
+        return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit'));
     }
 
     public function post_member_withdrawal(Request $request)
     {
         if ($request->session()->get('woh_member'))
         {
+            $member = new Member;
+            $member = $member->where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
             $tran_data = [
                 "woh_member" => $request->woh_member,
                 "woh_transaction_type" => 1,
                 "transaction_date" => Carbon::now(),
                 "tran_amount" => $request->amount,
+                "tax" => ($request->amount * 0.1),
+                "cd_payment" => ($member[0]['status'] == 0) ? ($request->amount/2) : null,
                 "notes" => $request->notes,
                 'status' => 2
             ];

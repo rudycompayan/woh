@@ -17,33 +17,43 @@
                                 <tr>
                                     <th>Request #</th>
                                     <th>Requested By</th>
+                                    <th>CD Account?</th>
                                     <th>Requested On</th>
                                     <th>Notes</th>
                                     <th>Status</th>
-                                    <th>Amount</th>
+                                    <th style="text-align: right">Amount</th>
+                                    <th style="text-align: right">Tax</th>
+                                    <th style="text-align: right">CD Payment</th>
+                                    <th style="text-align: right">Check Amt</th>
                                     <th class="td-actions">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @if(isset($member_tran))
-                                    <?php $withdrawals = 0; ?>
+                                    <?php $withdrawals = 0;  $tax = 0; $cd_payment = 0; ?>
                                     @foreach($member_tran as $key => $mt)
                                         <?php $withdrawals += $mt['tran_amount']; ?>
+                                        <?php $tax += $mt['tax']; ?>
+                                        <?php $cd_payment += $mt['cd_payment']; ?>
                                         <tr>
                                             <td>{!! $mt['woh_member_transaction'] !!}</td>
                                             <td>{!! $mt['first_name'] !!} {!! $mt['last_name'] !!}</td>
+                                            <td><?= $mt['m_status'] == 0 ? 'Yes' : 'No' ?></td>
                                             <td>{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
                                             <td>{!! $mt['notes'] !!}</td>
                                             <td>
-                                                @if($mt['status'] == 1)
+                                                @if($mt['w_status'] == 1)
                                                     Complete
-                                                @elseif($mt['status'] == 2)
+                                                @elseif($mt['w_status'] == 2)
                                                     Pending
                                                 @else
                                                     Disapproved
                                                 @endif
                                             </td>
                                             <td style="text-align: right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
+                                            <td style="text-align: right">&#8369; {!! number_format($mt['tax'],2) !!}</td>
+                                            <td style="text-align: right">&#8369; {!! number_format($mt['cd_payment'],2) !!}</td>
+                                            <td style="text-align: right">&#8369; {!! number_format((($mt['tran_amount']/2)-$mt['tax']),2) !!}</td>
                                             <td class="td-actions">
                                                 <a href="" class="btn btn-small btn-success approve"  data-woh_member_transaction="{!! $mt['woh_member_transaction'] !!}" data-action="approve">
                                                     <i class="btn-icon-only icon-ok"> </i>
@@ -56,8 +66,11 @@
                                     @endforeach
                                 @endif
                                 <tr>
-                                    <td colspan="5"><b>Totals ==></b></td>
+                                    <td colspan="6"><b>Totals ==></b></td>
                                     <td style="text-align: right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
+                                    <td style="text-align: right"><b>&#8369; {{ number_format($tax,2) }}</b></td>
+                                    <td style="text-align: right"><b>&#8369; {{ number_format($cd_payment,2) }}</b></td>
+                                    <td style="text-align: right"><b>&#8369; {{ number_format((($withdrawals/2)-$tax),2) }}</b></td>
                                     <td class="td-actions"> </td>
                                 </tr>
                                 </tbody>
@@ -79,12 +92,16 @@
     {!! Form::open(['data-remote','url' => action('AdminController@post_withdrawal_request_update'), 'id' => 'login_form']) !!}
     <fieldset>
         <div id="form1_error" class="alert alert-danger" role="alert" style="display: none"></div>
-        <label for="amount">Transaction No.</label>
-        <input type="text" name="transaction_no" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
-        <label for="amount">Check Number.</label>
-        <input type="text" name="check_num" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
-        <label for="amount">Date Issued</label>
-        <input type="text" name="issuance_date" id="amount" placeholder="03/01/2017" class="text ui-widget-content ui-corner-all" style="width: 100%">
+        <div class="approve-form">
+            <label for="amount">Transaction No.</label>
+            <input type="text" name="transaction_no" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
+            <label for="amount">Check Number.</label>
+            <input type="text" name="check_num" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
+            <label for="amount">Date Issued</label>
+            <input type="text" name="issuance_date" id="amount" placeholder="03/01/2017" class="text ui-widget-content ui-corner-all" style="width: 100%">
+        </div>
+        <label for="admin_notes" class="notes">Admin Notes</label>
+        <textarea name="admin_notes" id="admin_notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all notes" style="width:95%; height: 150px;"></textarea>
         <input type="hidden" name="woh_member_transaction" value="" id="woh_member_transaction_input">
         <input type="hidden" name="action" value="" id="action_text">
     </fieldset>
@@ -107,10 +124,13 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script>
     $(document).ready(function(){
+        $('.notes').hide();
         $( ".approve" ).on( "click", function(e) {
             e.preventDefault();
             $('#woh_member_transaction_input').val($(this).data('woh_member_transaction'));
             $('#action_text').val($(this).data('action'));
+            $('.notes').hide();
+            $('.approve-form').show();
             dialog3.dialog( "open" );
         });
 
@@ -120,47 +140,9 @@
             if (result) {
                 $('#woh_member_transaction_input').val($(this).data('woh_member_transaction'));
                 $('#action_text').val($(this).data('action'));
-                $('#ajax-loader').fadeIn();
-                alert(form3.prop('action'));
-                $.ajax({
-
-                    type: "POST",
-
-                    url: "{{action('AdminController@post_withdrawal_request_update')}}",
-
-                    data: form3.serialize(),
-
-                    success: function (data, NULL, jqXHR) {
-                        $('#ajax-loader').fadeOut();
-                        if (jqXHR.status === 200) {//redirect if  authenticated user.
-                            $(location).prop('pathname', '/withdrawal_request');
-                        }
-                    },
-                    error: function (data) {
-                        $('#ajax-loader').fadeOut();
-                        if (data.status === 401) {//redirect if not authenticated user
-                            alert("Member not found!");
-                        }
-                        if (data.status === 422) {
-                            //process validation errors here.
-                            var err_msg = '';
-                            var res = JSON.parse(data.responseText);
-                            for (var key in res) {
-                                if (res.hasOwnProperty(key)) {
-                                    var obj = res[key];
-                                    for (var prop in obj) {
-                                        if (obj.hasOwnProperty(prop)) {
-                                            err_msg += '<p>' + obj[prop] + "</p>";
-                                        }
-                                    }
-                                }
-                            }
-                            $('#first_name').focus();
-                            $('#form1_error').html(err_msg);
-                            $('#form1_error').fadeIn();
-                        }
-                    }
-                });
+                $('.notes').show();
+                $('.approve-form').hide();
+                dialog3.dialog( "open" );
             }
         });
 

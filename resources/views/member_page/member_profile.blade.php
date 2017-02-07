@@ -78,7 +78,8 @@
         $( function() {
             $('#register').click(function(e){
                 e.preventDefault();
-                $('#create-user').click();
+                //$('#create-user').click();
+                dialog.dialog( "open" );
             });
 
             var dialog, dialog2, form, form2 ,choose_dialog;
@@ -158,10 +159,10 @@
                 event.preventDefault();
             });
 
-            $( "#create-user" ).button().on( "click", function(e) {
+            /*$( "#create-user" ).button().on( "click", function(e) {
                 e.preventDefault();
                 dialog.dialog( "open" );
-            });
+            });*/
 
             form = dialog.find( "form" ).on( "submit", function( event ) {
                 event.preventDefault();
@@ -359,6 +360,8 @@
 
 <script>
     jQuery(document).ready(function() {
+        $('.entry').show();
+        $('.cd').hide();
 
         /* Custom jQuery for the example */
         $("#show-list").click(function(e){
@@ -446,6 +449,23 @@
             $('#form1_error').html('');
             $('#form1_error').fadeOut();
         });
+
+        $('#account_type').change(function(){
+           if($(this).val() == 'entry_code')
+           {
+               $('.entry').fadeIn();
+               $('.cd').fadeOut();
+               $('#status').val(1);
+               $('#picture').val('online.png');
+           }
+           else
+           {
+               $('.entry').fadeOut();
+               $('.cd').fadeIn();
+               $('#status').val(0);
+               $('#picture').val('floating.png');
+           }
+        });
     });
 </script>
 <div id="dialog-form" title="Member Registration">
@@ -489,11 +509,19 @@
             <label for="re-password">Re-type Password</label>
             <input type="password" maxlength="8" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <hr>
-            <label for="entry_code">Entry Code</label>
-            <input type="text" name="entry_code" id="entry_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
+            <label for="entry_code" class="entry">Choose Account</label>
+            <select name="account_type" id="account_type" class="text ui-widget-content ui-corner-all" style="width: 97%">
+                <option value="entry_code">Regular Account</option>
+                <option value="cd_code">CD Account</option>
+            </select>
+            <label for="entry_code" class="entry">Entry Code</label>
+            <input type="text" name="entry_code" id="entry_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all entry">
+            <label for="cd_code" class="cd">CD Code</label>
+            <input type="text" name="cd_code" id="cd_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all cd">
             <label for="pin_code">Pin Code</label>
             <input type="text" name="pin_code" id="pin_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
             <input type="hidden" id="upline_selected" value="{!! $member[0]->woh_member !!}">
+            <input type="hidden" id="status" value="1">
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
         </fieldset>
