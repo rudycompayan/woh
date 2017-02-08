@@ -385,7 +385,11 @@
                                     <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
                                     <td class='rows' style="width: 5%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['tax']) ? $mt['tax'] : 0,2) !!}</td>
                                     <td class='rows' style="width: 6%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['cd_payment']) ? $mt['cd_payment'] : 0,2) !!}</td>
+                                    @if(isset($mt['cd_payment']))
                                     <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format((($mt['tran_amount']/2)-$mt['tax']),2) !!}</td>
+                                    @else
+                                        <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format(($mt['tran_amount']-$mt['tax']),2) !!}</td>
+                                    @endif
                                 </tr>
                                 @endif
                             @endforeach

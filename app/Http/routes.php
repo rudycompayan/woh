@@ -26,6 +26,7 @@ Route::get('/gift_certificates', 'AdminController@gift_certificates');
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
 Route::post('/withdrawal_request_update', 'AdminController@post_withdrawal_request_update');
+Route::post('/gift_certificates', 'AdminController@post_gift_certificates');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

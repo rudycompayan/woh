@@ -266,15 +266,11 @@ class MemberController extends Controller
             "picture" => $request->picture,
             "username" => $request->username,
             "password" => $request->password,
+            "status" => $request->account_type == 'entry_code' ? 1 : 0
         ];
         $member = Member::create($data);
         if (!empty($member))
         {
-            if($request->account_type == 'entry_code')
-                \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $request->entry_code])->update(['status'=>1]);
-            \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $request->pin_code])->update(['status'=>1]);
-            if($request->account_type == 'cd_code')
-                \DB::table('woh_short_codes')->where(['type'=>3, 'code' => $request->pin_code])->update(['status'=>1]);
             if($request->account_type == 'entry_code')
             {
                 $tran_data = [
@@ -398,7 +394,7 @@ class MemberController extends Controller
                         "woh_member_transaction" => "----------",
                         "woh_member" => null,
                         "woh_transaction_type" => 5,
-                        "transaction_date" => Carbon::now()->format('m/d/Y H:i A'),
+                        "transaction_date" => Carbon::now(),
                         "tran_amount" => ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
@@ -460,7 +456,7 @@ class MemberController extends Controller
                         "woh_member_transaction" => "----------",
                         "woh_member" => null,
                         "woh_transaction_type" => 5,
-                        "transaction_date" => Carbon::now()->format('m/d/Y H:i A'),
+                        "transaction_date" => Carbon::now(),
                         "tran_amount" => ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,

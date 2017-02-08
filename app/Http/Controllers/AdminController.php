@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\GiftCertificate;
 use App\Models\Member;
 use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
@@ -139,7 +140,8 @@ class AdminController extends Controller
             $redirect = action('HomepageController@index');
             return redirect($redirect);
         }
-        return view('admin_page2.gift_certificate', compact('short_codes_count'));
+        $gc = GiftCertificate::get()->toArray();
+        return view('admin_page2.gift_certificate', compact('gc'));
     }
 
     public function post_withdrawal_request_update(Request $request)
@@ -219,6 +221,47 @@ class AdminController extends Controller
 
         return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
         ->header('Content-Type', 'application/json');
+    }
+
+    public function post_gift_certificates(Requests\GiftCertificateRequest $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+
+        $entry_code = ShortCodes::where(['status'=>0, 'type'=>1])->get()->toArray();
+        $pin_code = ShortCodes::where(['status'=>0, 'type'=>2])->get()->toArray();
+        $cd_code = ShortCodes::where(['status'=>0, 'type'=>3])->get()->toArray();
+        $bar_code = ShortCodes::where(['status'=>0, 'type'=>4])->get()->toArray();
+
+        for($x=1; $x<= $request->gc_number; $x++)
+        {
+            $data = [
+                'to' => $request->gc_to,
+                'gc_name' => $request->gc_name,
+                'date_created' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
+                'description' => $request->gc_description,
+                'amount' => $request->gc_amount,
+                'bar_code' => $bar_code[$x]['code'],
+                'pin_code' => ($request->code ? $pin_code[0]['code'] : null),
+                'entry_code'=>($request->code == 1 ? $entry_code[0]['code'] : null),
+                'cd_code'=>($request->code == 2 ? $cd_code[0]['code'] : null),
+                'status' => ($request->code == 2 ? 2 : 0),
+            ];
+            GiftCertificate::create($data);
+
+            if($request->code == 1)
+                \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $entry_code[0]['code']])->update(['status'=>1]);
+            if($request->code == 2)
+                \DB::table('woh_short_codes')->where(['type'=>3, 'code' => $cd_code[0]['code']])->update(['status'=>1]);
+            if($request->code)
+                \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $pin_code[$x]['code']])->update(['status'=>1]);
+            \DB::table('woh_short_codes')->where(['type'=>4, 'code' => $bar_code[0]['code']])->update(['status'=>1]);
+        }
+        $redirect = action('AdminController@gift_certificates');
+        return redirect($redirect);
     }
 
     private function generatePin( $number ) {
