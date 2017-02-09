@@ -22,11 +22,13 @@ Route::get('/admin_profile/logout', 'AdminController@admin_logout');
 Route::get('/withdrawal_request', 'AdminController@withdrawal_request');
 Route::get('/short_codes', 'AdminController@short_codes');
 Route::get('/gift_certificates', 'AdminController@gift_certificates');
+Route::get('/redeem_gc', 'AdminController@redeem_gc');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
 Route::post('/withdrawal_request_update', 'AdminController@post_withdrawal_request_update');
 Route::post('/gift_certificates', 'AdminController@post_gift_certificates');
+Route::post('/redeem_gc', 'AdminController@post_redeem_gc');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

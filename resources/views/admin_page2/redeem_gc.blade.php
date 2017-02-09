@@ -1,6 +1,6 @@
 @extends('admin_dashboard')
 @section('content')
-<!-- /subnavbar -->
+        <!-- /subnavbar -->
 <div class="main clearfix">
     <div class="main-inner">
         <div class="container">
@@ -8,7 +8,7 @@
                 <div class="span4">
                     <div class="widget widget-nopad">
                         <div class="widget-header"> <i class="icon-list-alt"></i>
-                            <h3>Gift Certificate Generator</h3>
+                            <h3>Redeem Gift Certificate</h3>
                         </div>
                         <!-- /widget-header -->
                         <div class="widget-content">
@@ -22,51 +22,32 @@
                                         </ul>
                                     </div>
                                 @endif
-                                <form action="{{action('AdminController@gift_certificates')}}" method="post">
+                                @if(!empty($error_msg))
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            <li>{!! $error_msg !!}</li>
+                                        </ul>
+                                    </div>
+                                @endif
+                                @if(!empty($success_msg))
+                                    <div class="alert alert-success">
+                                        <ul>
+                                            <li>{!! $success_msg !!}</li>
+                                        </ul>
+                                    </div>
+                                @endif
+                                <form action="{{action('AdminController@redeem_gc')}}" method="post">
                                     <li style="width: 100%;  border: none; margin-bottom: 0px">
                                         <div class="news-item-detail">
-                                            <label href="#" class="news-item-title" target="_blank">GC To</label>
+                                            <label href="#" class="news-item-title" target="_blank">Please Enter Barcode</label>
                                             <p class="news-item-preview">
-                                                <input type="text" name="gc_to" style="width: 86%;" value="Walk In">
+                                                <input type="text" name="barcode" style="width: 86%;" value="">
                                             </p>
                                         </div>
                                     </li>
-                                    <li style="width: 100%; border: none; margin-bottom: 0px;">
-                                        <div class="news-item-detail">
-                                            <label href="#" class="news-item-title" target="_blank">GC Name</label>
-                                            <p class="news-item-preview"><input type="text" name="gc_name" style="width: 86%;"></p>
-                                        </div>
-                                    </li>
-                                    <li style="width: 100%; border: none; margin-bottom: 0px">
-                                        <div class="news-item-detail">
-                                            <label href="#" class="news-item-title" target="_blank">GC Description</label>
-                                            <p class="news-item-preview"><input type="text" name="gc_description" style="width: 86%;"></p>
-                                        </div>
-                                    </li>
-                                    <li style="width: 100%; border: none; margin-bottom: 0px">
-                                        <div class="news-item-detail">
-                                            <label href="#" class="news-item-title" target="_blank">GC Amount</label>
-                                            <p class="news-item-preview"><input type="text" name="gc_amount" style="width: 86%;"></p>
-                                        </div>
-                                    </li>
                                     <li style="width: 100%">
                                         <div class="news-item-detail">
-                                            <label href="#" class="news-item-title" target="_blank"  class="entry">Append</label>
-                                             <table cellpadding="5">
-                                                 <tr>
-                                                     <td class="checkbox entry"><input type="radio" class="code" name="code" value="1"> Entry Code</td>
-                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="2"> CD Code</td>
-                                                 </tr>
-                                                 <tr>
-                                                     <td colspan="3"><input type="text" name="gc_number" placeholder="No of GC to produce"></td>
-                                                 </tr>
-                                             </table>
-                                        </div>
-                                    </li>
-                                    <li style="width: 100%">
-                                        <div class="news-item-detail">
-                                            <button class="button btn btn-primary btn-large" onclick="this.form.submit()">Generate</button>
-                                            <a href="{{action('AdminController@gift_certificates')}}"><button class="button btn btn-primary btn-large">Refresh</button></a>
+                                            <button class="button btn btn-primary btn-large" onclick="this.form.submit()">Redeem</button>
                                         </div>
                                     </li>
                                 </form>
@@ -78,7 +59,7 @@
                 <div class="span8">
                     <div class="widget widget-nopad">
                         <div class="widget-header"> <i class="icon-list-alt"></i>
-                            <h3>Gift Certificate Preview (Sample)</h3>
+                            <h3>Gift Certificate Preview</h3>
                         </div>
                         <!-- /widget-header -->
                         <div class="widget-content" style="overflow: auto; height: 480px" id="print-element">

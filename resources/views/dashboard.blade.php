@@ -95,7 +95,7 @@
    <header id="stuck_container">
       <div class="container">
          <h1 class="navbar-brand navbar-brand_">
-            <a href="index.html">WINDOWS OF HEAVEN HYPERMART</a>
+            <a href="{{ action('HomepageController@index') }}">WINDOWS OF HEAVEN HYPERMART</a>
          </h1>
 
          <nav class="navbar navbar-default navbar-static-top tm_navbar clearfix" role="navigation">
@@ -124,6 +124,7 @@
                <li @if(Request::segment(1) == "gallery") class="active" @endif><a href="{{ action('HomepageController@gallery_page') }}">Gallery</a></li>
 
                <li @if(Request::segment(1) == "contact") class="active" @endif><a href="{{ action('HomepageController@contact_page') }}">Contacts</a></li>
+               <li><a href="http://shopping.wohhypermart.com/">Shop Now</a></li>
                @if(\Session::get('member'))
                   <li><a href="{{action('MemberController@member_profile')}}">My Profile</a></li>
                @else

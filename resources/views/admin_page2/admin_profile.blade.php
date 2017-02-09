@@ -85,7 +85,7 @@
                                     <i class="shortcut-icon icon-picture"></i>
                                     <span class="shortcut-label">Gift Certificates</span>
                                 </a>
-                                <a href="{{action('AdminController@admin_profile')}}" class="shortcut">
+                                <a href="{{action('AdminController@redeem_gc')}}" class="shortcut">
                                     <i class="shortcut-icon icon-tag"></i>
                                     <span class="shortcut-label">Redeem GC</span>
                                 </a>

@@ -144,6 +144,16 @@ class AdminController extends Controller
         return view('admin_page2.gift_certificate', compact('gc'));
     }
 
+    public function redeem_gc(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        return view('admin_page2.redeem_gc');
+    }
+
     public function post_withdrawal_request_update(Request $request)
     {
         if(!$request->session()->get('woh_admin_user'))
@@ -256,12 +266,37 @@ class AdminController extends Controller
                 \DB::table('woh_short_codes')->where(['type'=>1, 'code' => $entry_code[0]['code']])->update(['status'=>1]);
             if($request->code == 2)
                 \DB::table('woh_short_codes')->where(['type'=>3, 'code' => $cd_code[0]['code']])->update(['status'=>1]);
-            if($request->code)
-                \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $pin_code[$x]['code']])->update(['status'=>1]);
-            \DB::table('woh_short_codes')->where(['type'=>4, 'code' => $bar_code[0]['code']])->update(['status'=>1]);
+            \DB::table('woh_short_codes')->where(['type'=>4, 'code' => $bar_code[$x]['code']])->update(['status'=>1]);
         }
+        if($request->code ==1 || $request->code ==2)
+            \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $pin_code[$x]['code']])->update(['status'=>1]);
         $redirect = action('AdminController@gift_certificates');
         return redirect($redirect);
+    }
+
+    public function post_redeem_gc(Requests\RedeemGCRequest $request)
+    {
+        $error_msg = '';
+        $success_msg = '';
+        $gc = [];
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+
+        $gc = GiftCertificate::where(['bar_code'=>$request->barcode])->get()->toArray();
+        if(empty($gc))
+            $error_msg = 'GC not found';
+        elseif(!empty($gc) && $gc[0]['status'] == 1)
+            $error_msg = 'GC was already redeemed.';
+        elseif(!empty($gc) && $gc[0]['status'] == 0)
+        {
+            \DB::table('woh_gc')->where(['bar_code'=>$request->barcode])->update(['status'=>1]);
+            $gc = GiftCertificate::where(['bar_code'=>$request->barcode])->get()->toArray();
+            $success_msg = 'GC successfully redeemed.';
+        }
+        return view('admin_page2.redeem_gc', compact('error_msg','success_msg','gc'));
     }
 
     private function generatePin( $number ) {

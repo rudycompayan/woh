@@ -10,7 +10,7 @@
                     <h2>About Us</h2>
                     <div class="thumb-pad4 clearfix">
                         <div class="thumbnail">
-                            <figure><img src="main_page/img/page2_pic1.jpg" alt=""></figure>
+                            <figure><img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQhYqSwrLueE8hWFblA9_jJ6FW74ETu8JMgU2km4jmoqHebA0QewA" alt=""></figure>
                             <div class="caption">
                                 <h3>Maecenas lacus erat, hendrerit vestib istique vel, maximus vitae purus.</h3>
                                 <p>Donec pellentesque nulla nec purus placerat vestibulum. Maecenas et quam eu nisi mattis porta. Aliquam tincidunt leo lorem, nec interdum lectus laoreet dapibus. Nullam vel tempor est. Vestibulum sed arcu quis ipsum aliquam viverra. Suspendisse potenti. Aenean blandit maxi.</p>
@@ -67,7 +67,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6 wow fadeIn maxheight">
                         <div class="thumb-pad1">
                             <div class="thumbnail">
-                                <figure><img src="main_page/img/page2_pic2.jpg" alt=""></figure>
+                                <figure><img src="http://wowphilippines.com/wp-content/uploads/2015/10/Grocery.jpg" alt=""></figure>
                                 <div class="caption">
                                     <a href="#">Eva Adamson</a>
                                     <p>Maecenas et quam eu nisi mattis porta. Aliquam tincidunt leo tempor est. Ves</p>
@@ -78,7 +78,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6 wow fadeIn maxheight" data-wow-delay="0.1s">
                         <div class="thumb-pad1">
                             <div class="thumbnail">
-                                <figure><img src="main_page/img/page2_pic3.jpg" alt=""></figure>
+                                <figure><img src="http://wowphilippines.com/wp-content/uploads/2015/10/Grocery.jpg" alt=""></figure>
                                 <div class="caption">
                                     <a href="#">David Austin</a>
                                     <p>Sed arcu quis ipsum aliquam viverra uspendisse potenti. Aenean blandit.</p>
@@ -89,7 +89,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6 wow fadeIn maxheight" data-wow-delay="0.2s">
                         <div class="thumb-pad1">
                             <div class="thumbnail">
-                                <figure><img src="main_page/img/page2_pic4.jpg" alt=""></figure>
+                                <figure><img src="http://wowphilippines.com/wp-content/uploads/2015/10/Grocery.jpg" alt=""></figure>
                                 <div class="caption">
                                     <a href="#">Natalie Barnes</a>
                                     <p>Vestibulum sed arcu quis ipsum aliquam viverra. Suspendisse potenti aenean.</p>
@@ -100,7 +100,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6 wow fadeIn maxheight" data-wow-delay="0.3s">
                         <div class="thumb-pad1">
                             <div class="thumbnail">
-                                <figure><img src="main_page/img/page2_pic5.jpg" alt=""></figure>
+                                <figure><img src="http://wowphilippines.com/wp-content/uploads/2015/10/Grocery.jpg" alt=""></figure>
                                 <div class="caption">
                                     <a href="#">Thomas Bishop</a>
                                     <p>Quam eu nisi mattis porta. Aliquam tinc sed arcu quis ipsum aliquam viverra.</p>

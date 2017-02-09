@@ -60,7 +60,7 @@
                 <li><a href="#"><i class="icon-user"></i><span>Users</span> </a> </li>
                 <li><a href="#"><i class="icon-facetime-video"></i><span>Notifications</span> </a></li>
                 <li @if(Request::segment(1) == "gift_certificates") class="active" @endif><a href="{{action('AdminController@gift_certificates')}}"><i class="icon-bar-chart"></i><span>GC's</span> </a> </li>
-                <li><a href="#"><i class="icon-tag"></i><span>Redeem GC</span> </a></li>
+                <li @if(Request::segment(1) == "redeem_gc") class="active" @endif><a href="{{action('AdminController@redeem_gc')}}"><i class="icon-tag"></i><span>Redeem GC</span> </a></li>
                 <li @if(Request::segment(1) == "short_codes") class="active" @endif><a href="{{action('AdminController@short_codes')}}"><i class="icon-code"></i><span>Shortcodes</span> </a> </li>
                 <li @if(Request::segment(1) == "withdrawal_request") class="active" @endif><a href="{{action('AdminController@withdrawal_request')}}"> <i class="icon-long-arrow-down"></i><span>Withdrawal Request</span> <b class="caret"></b></a>
                 {{--    <ul class="dropdown-menu">

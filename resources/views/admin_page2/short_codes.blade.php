@@ -36,13 +36,13 @@
                                             <form action="{{action('AdminController@post_short_codes')}}" method="post" style="width: 100%">
                                                 <div class="login-fields">
                                                     <span class="login-checkbox">
-                                                        <input id="Field" name="type[]" type="checkbox" class="field login-checkbox" value="1" tabindex="1" />
+                                                        <input id="Field" name="type[1]" type="checkbox" class="field login-checkbox" value="1" tabindex="1" />
                                                         Entry Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['entry_count'] !!}</span>) <span style="color:#9d261d;">codes left</span><br>
-                                                        <input id="Field" name="type[]" type="checkbox" class="field login-checkbox" value="2" tabindex="2" />
+                                                        <input id="Field" name="type[2]" type="checkbox" class="field login-checkbox" value="2" tabindex="2" />
                                                         Pin Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['pin_count'] !!}</span>) <span style="color:#9d261d;">codes left</span><br>
-                                                        <input id="Field" name="type[]" type="checkbox" class="field login-checkbox" value="3" tabindex="3" />
+                                                        <input id="Field" name="type[3]" type="checkbox" class="field login-checkbox" value="3" tabindex="3" />
                                                         CD Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['cd_count'] !!}</span>) <span style="color:#9d261d;">codes left</span> <br>
-                                                        <input id="Field" name="type[]" type="checkbox" class="field login-checkbox" value="4" tabindex="3" />
+                                                        <input id="Field" name="type[4]" type="checkbox" class="field login-checkbox" value="4" tabindex="3" />
                                                         Bar Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['bar_count'] !!}</span>) <span style="color:#9d261d;">codes left</span>
                                                     </span>
                                                     <div class="field">

@@ -11,7 +11,7 @@
 
             <p class="title wow fadeIn">Welcome</p>
 
-            <p class="description wow fadeIn">We provide unmatched innovation and quality distribution of outstanding products and services to local, regional and global markets and to open the doors of opportunity and prosperity by empowering our distributors to achieve financial independence and economic stability by maximizing the wealth of the market thru our breakthrough products and services.</p>
+            <p class="description wow fadeIn">Secivres dna stcudorp hguorhtkaerb ruo urht tekram eht fo htlaew eht gnizimixam yb ytilibats cimonoce dna ecnednepedni laicnanif eveihca ot srotubirtsid ruo gnirewopme yb ytirepsorp dna ytinutroppo fo srood eht nepo ot dna stekram labolg dna lanoiger ,lacol ot secivres dna stcudorp gnidnatstuo fo noitubirtsid ytilauq dna noitavonni dehctamnu edivorp ew.</p>
 
             <div class="row">
 
