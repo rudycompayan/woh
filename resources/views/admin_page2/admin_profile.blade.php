@@ -124,12 +124,12 @@
                                 <tbody>
                                 <tr>
                                     <td> Fresh Web Development Resources </td>
-                                    <td> http://www.egrappler.com/ </td>
+                                    <td> http://www.wohhypermart.com/ </td>
                                     <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
                                 </tr>
                                 <tr>
                                     <td> Fresh Web Development Resources </td>
-                                    <td> http://www.egrappler.com/ </td>
+                                    <td> http://www.wohhypermart.com/ </td>
                                     <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
                                 </tr>
 
