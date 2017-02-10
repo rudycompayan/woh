@@ -86,11 +86,11 @@
 
             dialog = $( "#dialog-form" ).dialog({
                 autoOpen: false,
-                height: 670,
+                height: 520,
                 width: 800,
                 modal: true,
                 buttons: {
-                    "Save": function(){
+                    "Submit": function(){
                         $('#ajax-loader').fadeIn();
                         $.ajax({
 
@@ -199,18 +199,27 @@
                 $('#address').val('{!! $member[0]->address !!}');
                 $('#gender').val('{!! $member[0]->gender !!}');
                 $('#bday').val('{!! $member[0]->bday !!}');
+                $('#username').val('{!! $member[0]->username !!}{!! ($member_heads+1) !!}');
+                $('#password').val('{!! $member[0]->password !!}');
+                $('#re-password').val('{!! $member[0]->password !!}');
                 $('#first_name').hide();
                 $('#last_name').hide();
                 $('#middle_name').hide();
                 $('#address').hide();
                 $('#gender').hide();
                 $('#bday').hide();
+                $('#username').hide();
+                $('#password').hide();
+                $('#re-password').hide();
                 $('#lfname').hide();
                 $('#llname').hide();
                 $('#lmname').hide();
                 $('#laddress').hide();
                 $('#lgender').hide();
                 $('#lbday').hide();
+                $('#lusername').hide();
+                $('#lpassword').hide();
+                $('#lre-password').hide();
                 dialog.dialog( "open" );
             });
 
@@ -360,7 +369,7 @@
 
 <script>
     jQuery(document).ready(function() {
-        $('.entry').show();
+        $('.entry').hide();
         $('.cd').hide();
 
         /* Custom jQuery for the example */
@@ -502,24 +511,25 @@
             <input type="hidden" name="picture" id="picture" placeholder="picture" value="online.png" class="text ui-widget-content ui-corner-all">
             <!--<label for="email">Email</label>
                 <input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">-->
-            <label for="username">Username</label>
+            <label for="username" id="lusername">Username</label>
             <input type="username" maxlength="8" name="username" id="username" placeholder="username123" class="text ui-widget-content ui-corner-all">
-            <label for="password">Password</label>
+            <label for="password" id="lpassword">Password</label>
             <input type="password" maxlength="8" name="password" id="password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
-            <label for="re-password">Re-type Password</label>
+            <label for="re-password" id="lre-password">Re-type Password</label>
             <input type="password" maxlength="8" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <hr>
             <label for="entry_code" class="entry">Choose Account</label>
             <select name="account_type" id="account_type" class="text ui-widget-content ui-corner-all" style="width: 97%">
+                <option value="">Choose Account</option>
                 <option value="entry_code">Regular Account</option>
                 <option value="cd_code">CD Account</option>
             </select>
+            <label for="pin_code">Pin Code</label>
+            <input type="text" name="pin_code" id="pin_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
             <label for="entry_code" class="entry">Entry Code</label>
             <input type="text" name="entry_code" id="entry_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all entry">
             <label for="cd_code" class="cd">CD Code</label>
             <input type="text" name="cd_code" id="cd_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all cd">
-            <label for="pin_code">Pin Code</label>
-            <input type="text" name="pin_code" id="pin_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all">
             <input type="hidden" id="upline_selected" value="{!! $member[0]->woh_member !!}">
             <input type="hidden" id="status" value="1">
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
@@ -553,7 +563,9 @@
     <button id="create-user" style="display: none">Create new user</button>
 </div>
 <div id="choose_dialog" title="Select Downline" style="text-align: center">
+    @if($member_heads < 7)
     <a id="add-account"><img src="member_page/images/plus.png" width="50"></a>
+    @endif
     <a id="new-account"><img src="member_page/images/downline.png" width="50"></a>
 </div>
 </body>

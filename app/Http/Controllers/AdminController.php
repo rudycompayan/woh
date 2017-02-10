@@ -13,6 +13,7 @@ use Faker\Provider\Barcode;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Maatwebsite\Excel\Facades\Excel;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS1DFacade;
 use Milon\Barcode\Facades\DNS2DFacade;
@@ -110,12 +111,14 @@ class AdminController extends Controller
             {
                 for($x=1; $x<= $request->max_no; $x++)
                 {
+                    $code = $this->generatePin(10);
                     $tran_data = [
-                        "code" => $this->generatePin(10),
+                        "code" => $code,
                         "type" => $t,
                         'status' => 0
                     ];
-                    ShortCodes::create($tran_data);
+                    if(empty(ShortCodes::where(['code'=>$code,"type" => $t,])->get()->toArray()))
+                        ShortCodes::create($tran_data);
                 }
             }
             $error_msg = 'Codes successfully updated.';
@@ -140,7 +143,7 @@ class AdminController extends Controller
             $redirect = action('HomepageController@index');
             return redirect($redirect);
         }
-        $gc = GiftCertificate::get()->toArray();
+        $gc = GiftCertificate::orderBy('woh_gc','desc')->get()->toArray();
         return view('admin_page2.gift_certificate', compact('gc'));
     }
 
@@ -214,6 +217,8 @@ class AdminController extends Controller
                         ];
                         MemberTransaction::create($tran_data);
                     }
+
+                    \DB::table('woh_gc')->where(['cd_code' => $member[0]['cd_code']])->update(['status'=>1]);
                 }
             }
         }
@@ -258,7 +263,7 @@ class AdminController extends Controller
                 'pin_code' => ($request->code ? $pin_code[0]['code'] : null),
                 'entry_code'=>($request->code == 1 ? $entry_code[0]['code'] : null),
                 'cd_code'=>($request->code == 2 ? $cd_code[0]['code'] : null),
-                'status' => ($request->code == 2 ? 2 : 0),
+                'status' => ($request->code == 2 ? 3 : 0),
             ];
             GiftCertificate::create($data);
 
@@ -269,7 +274,7 @@ class AdminController extends Controller
             \DB::table('woh_short_codes')->where(['type'=>4, 'code' => $bar_code[$x]['code']])->update(['status'=>1]);
         }
         if($request->code ==1 || $request->code ==2)
-            \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $pin_code[$x]['code']])->update(['status'=>1]);
+            \DB::table('woh_short_codes')->where(['type'=>2, 'code' => $pin_code[0]['code']])->update(['status'=>1]);
         $redirect = action('AdminController@gift_certificates');
         return redirect($redirect);
     }
@@ -288,14 +293,18 @@ class AdminController extends Controller
         $gc = GiftCertificate::where(['bar_code'=>$request->barcode])->get()->toArray();
         if(empty($gc))
             $error_msg = 'GC not found';
-        elseif(!empty($gc) && $gc[0]['status'] == 1)
+        elseif(!empty($gc) && $gc[0]['status'] == 2)
             $error_msg = 'GC was already redeemed.';
-        elseif(!empty($gc) && $gc[0]['status'] == 0)
+        elseif(!empty($gc) && $gc[0]['status'] == 4)
+            $error_msg = 'Can\'t redeemed GC! It belongs to CD Account owner. Please pay credit first to redeem.';
+        elseif(!empty($gc) && $gc[0]['status'] == 1)
         {
-            \DB::table('woh_gc')->where(['bar_code'=>$request->barcode])->update(['status'=>1]);
+            \DB::table('woh_gc')->where(['bar_code'=>$request->barcode])->update(['status'=>2]);
             $gc = GiftCertificate::where(['bar_code'=>$request->barcode])->get()->toArray();
             $success_msg = 'GC successfully redeemed.';
         }
+        else
+            $error_msg = 'GC not registered! Please register to our KLP Marketing Team using this GC. Thank you!';
         return view('admin_page2.redeem_gc', compact('error_msg','success_msg','gc'));
     }
 

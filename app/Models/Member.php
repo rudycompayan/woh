@@ -21,6 +21,7 @@ class Member extends Model
         "picture" ,
         "username",
         "password",
-        "status"
+        "status",
+        "cd_code"
     ];
 }

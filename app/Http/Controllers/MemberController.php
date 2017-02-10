@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DownlineLevel;
+use App\Models\GiftCertificate;
 use App\Models\Member;
 use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
@@ -24,9 +25,10 @@ class MemberController extends Controller
         }
         $member = new Member;
         $member = $member->where('woh_member',$request->session()->get('woh_member'))->get();
+        $member_heads = Member::where(['last_name'=>$member[0]->last_name, 'first_name'=>$member[0]->first_name, 'middle_name'=>$member[0]->middle_name])->count();
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
-        return view('member_page.member_profile', compact('member', 'downlines'));
+        return view('member_page.member_profile', compact('member', 'downlines', 'member_heads'));
     }
 
     public function downline($upline)
@@ -241,6 +243,8 @@ class MemberController extends Controller
             $this->validate($request, ["entry_code" =>'required']);
             if(empty(ShortCodes::where(['type'=>1, 'code'=>$request->entry_code])->get()->toArray()))
                 return response(['msg' => 'Entry code not found!'], 401)->header('Content-Type', 'application/json');
+            if(empty($rudy=GiftCertificate::where(['entry_code'=>$request->entry_code, 'status'=>0])->get()->toArray()))
+                return response(['msg' => 'Entry code was already used!'], 401)->header('Content-Type', 'application/json');
         }
 
         if($request->account_type == 'cd_code')
@@ -248,12 +252,21 @@ class MemberController extends Controller
             $this->validate($request, ["cd_code" => 'required']);
             if(empty(ShortCodes::where(['type'=>3, 'code'=>$request->cd_code])->get()->toArray()))
                 return response(['msg' => 'CD code not found!'], 401)->header('Content-Type', 'application/json');
+            if(empty(GiftCertificate::where(['cd_code'=>$request->cd_code, 'status'=>3])->get()->toArray()))
+                return response(['msg' => 'CD code was already used!'], 401)->header('Content-Type', 'application/json');
         }
 
         if(empty(ShortCodes::where(['type'=>2, 'code'=>$request->pin_code])->get()->toArray()))
             return response(['msg' => 'Pin code not found!'], 401)->header('Content-Type', 'application/json');
+        if(empty(GiftCertificate::where(['pin_code'=>$request->pin_code, 'status'=>($request->cd_code ? 3 : 0)])->get()->toArray()))
+            return response(['msg' => 'Pin code was already used!'], 401)->header('Content-Type', 'application/json');
 
-        $data = [
+        if($request->account_type == 'cd_code')
+            \DB::table('woh_gc')->where(['cd_code' => $request->cd_code])->update(['status'=>4]);
+        else
+            \DB::table('woh_gc')->where(['entry_code' => $request->entry_code])->update(['status'=>1]);
+
+            $data = [
             "first_name" => $request->first_name,
             "last_name" => $request->last_name,
             "middle_name" => $request->middle_name,
@@ -266,8 +279,9 @@ class MemberController extends Controller
             "picture" => $request->picture,
             "username" => $request->username,
             "password" => $request->password,
-            "status" => $request->account_type == 'entry_code' ? 1 : 0
-        ];
+            "status" => $request->account_type == 'entry_code' ? 1 : 0,
+            "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null
+            ];
         $member = Member::create($data);
         if (!empty($member))
         {
