@@ -323,22 +323,23 @@
         <thead>
         <tr>
             <th class='th-rows' style="width: 5%">Req. #</th>
-            <th class='th-rows' style="width: 15%">Transaction No.</th>
+            <th class='th-rows' style="width: 11%">Transaction No.</th>
             <th class='th-rows' style="width: 10%">Check No.</th>
-            <th class='th-rows' style="width: 12%">Transaction Date</th>
-            <th class='th-rows' style="width: 12%">Issuance Date</th>
+            <th class='th-rows' style="width: 10%">Transaction Date</th>
+            <th class='th-rows' style="width: 10%">Issuance Date</th>
             <th class='th-rows' style="width: 5%">Status</th>
             <th class='th-rows' style="width: 10%">Admin Notes</th>
             <th class='th-rows' style="width: 10%" align="right">(&#8369;) Principal Amt.</th>
             <th class='th-rows' style="width: 5%" align="right">(&#8369;) Tax </th>
-            <th class='th-rows' style="width: 6%" align="right">(&#8369;) CD Payment </th>
+            <th class='th-rows' style="width: 8%" align="right">(&#8369;) CD Payment </th>
+            <th class='th-rows' style="width: 6%" align="right">(&#8369;) Change </th>
             <th class='th-rows' style="width: 10%" align="right">(&#8369;) Check Amt. </th>
         </tr>
         </thead>
         <tbody style="overflow: auto">
         <tr>
             <td colspan="11" style="padding: 0px;">
-                <div style="width: 100%; max-height: 500px; overflow: auto;">
+                <div style="width: 111%; max-height: 500px; overflow: auto;">
                     <table class="table-grid" cellspacing="0" style="width: 100%; margin: 0px">
                         <tbody>
                         @if(isset($member_tran))
@@ -347,6 +348,8 @@
                             $withdrawals = 0;
                             $tax = 0;
                             $cd_deduction = 0;
+                            $check_amt = 0;
+                            $change = 0;
                             krsort($member_tran);
                             ?>
                             @foreach($member_tran as $key => $mt)
@@ -360,18 +363,24 @@
                                     $tax += !empty($mt['tax']) ? $mt['tax'] : 0;
                                     $cd_deduction += !empty($mt['cd_payment']) ? $mt['cd_payment'] : 0;
                                 }
+                                if($mt['woh_transaction_type'] == 1 && isset($mt['cd_payment']) && $mt['cd_payment'] > 0)
+                                    $check_amt += ($mt['tran_amount']-$mt['tax'])/2;
+                                elseif($mt['woh_transaction_type'] == 1 && !isset($mt['cd_payment']))
+                                    $check_amt += $mt['tran_amount']-$mt['tax'];
+                                if($mt['woh_transaction_type'] == 1)
+                                    $change += $mt['change'];
                                 ?>
                                 @if($mt['woh_transaction_type'] == 1)
                                 <tr style="background-color: @if($mt['woh_member_transaction']%2==0) #efefef @else #ffffff @endif;">
                                     <td class='rows' style="width: 5%; @if($mt['status']==3) text-decoration: line-through; @endif">
                                         {!! $mt['woh_member_transaction'] !!}
                                     </td>
-                                    <td class='rows' style="width: 15%">
+                                    <td class='rows' style="width: 11%">
                                         {!! $mt['transaction_no'] !!}
                                     </td>
                                     <td class='rows' style="width: 10%">{!! $mt['check_number'] !!}</td>
-                                    <td class='rows' style="width: 12%; @if($mt['status']==3) text-decoration: line-through; @endif">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
-                                    <td class='rows' style="width: 12%">{!! $mt['issuance_date'] ? \Carbon\Carbon::parse($mt['issuance_date'])->format('m/d/Y H:i A') : '--------------------' !!}</td>
+                                    <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif">{!! \Carbon\Carbon::parse($mt['transaction_date'])->format('m/d/Y H:i A') !!}</td>
+                                    <td class='rows' style="width: 10%">{!! $mt['issuance_date'] ? \Carbon\Carbon::parse($mt['issuance_date'])->format('m/d/Y H:i A') : '--------------------' !!}</td>
                                     <td class='rows' style="width: 5%">
                                         @if($mt['status'] == 1)
                                             Complete
@@ -384,9 +393,10 @@
                                     <td class='rows' style="width: 10%">{!! $mt['admin_notes'] !!}</td>
                                     <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
                                     <td class='rows' style="width: 5%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['tax']) ? $mt['tax'] : 0,2) !!}</td>
-                                    <td class='rows' style="width: 6%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['cd_payment']) ? $mt['cd_payment'] : 0,2) !!}</td>
-                                    @if(isset($mt['cd_payment']))
-                                    <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format((($mt['tran_amount']/2)-$mt['tax']),2) !!}</td>
+                                    <td class='rows' style="width: 8%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['cd_payment']) ? $mt['cd_payment'] : 0,2) !!}</td>
+                                    <td class='rows' style="width: 6%; @if($mt['status']==3) text-decoration: line-through; @endif" align="right">&#8369; {!! number_format(!empty($mt['change']) ? $mt['change'] : 0,2) !!}</td>
+                                    @if(isset($mt['cd_payment']) && $mt['cd_payment'] > 0)
+                                        <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format((($mt['tran_amount']-$mt['tax'])/2)+$mt['change'],2) !!}</td>
                                     @else
                                         <td class='rows' style="width: 10%; @if($mt['status']==3) text-decoration: line-through; @endif;" align="right">&#8369; {!! number_format(($mt['tran_amount']-$mt['tax']),2) !!}</td>
                                     @endif
@@ -404,32 +414,33 @@
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($tax,2) }}</b></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($cd_deduction,2) }}</b></td>
-            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format((($withdrawals/2)-$tax),2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($change,2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format(($check_amt + $change),2) }}</b></td>
         </tr>
         <tr style="color: #2b542c;">
-            <td class='rows' colspan="9"  style="color: #2b542c; border-top: 1px solid lightgray">Current Balance ==></td>
+            <td class='rows' colspan="10"  style="color: #2b542c; border-top: 1px solid lightgray">Current Balance ==></td>
             <td class='rows'  style="color: #2b542c; border-top: 1px solid lightgray"></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><span class="totals"><b>&#8369; {{ number_format($earn,2) }}</b></span></td>
         </tr>
         <tr style="color: #761c19; background-color: #efefef">
-            <td class='rows' colspan="9">Total Withdrawals ==></td>
+            <td class='rows' colspan="10">Total Withdrawals ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><span class="totals-w"><b>&#8369; {{ number_format(($withdrawals-$tax),2) }}</b></span></td>
         </tr>
         <tr style="color: #761c19;">
-            <td class='rows' colspan="9">Total Tax ==></td>
+            <td class='rows' colspan="10">Total Tax ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><span class="totals-t"><b>&#8369; {{ number_format($tax,2) }}</b></span></td>
         </tr>
         @if(!empty($member_credit))
         <tr style="color: #761c19;">
-            <td class='rows' colspan="9">CD Account Credit ==></td>
+            <td class='rows' colspan="10">CD Account Credit ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><span class="totals-t"><b>&#8369; {{ number_format($member_credit[0]['credit_amount'],2) }}</b></span></td>
         </tr>
         @endif
         <tr style="color: #2a6496;  background-color: #efefef">
-            <td class='rows' colspan="9">Remaining Balance ==></td>
+            <td class='rows' colspan="10">Remaining Balance ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><span class="totals-b"><b id="savings">&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></span></td>
         </tr>

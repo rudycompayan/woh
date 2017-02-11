@@ -72,7 +72,7 @@ class AdminController extends Controller
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
             ->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_transaction.woh_member')
             ->where(['woh_member_transaction.woh_transaction_type'=>1, 'woh_member_transaction.status'=>2])->orderBy('woh_member_transaction','desc')->get([
-                'first_name','last_name', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
+                'first_name','last_name', 'change', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
             ])->toArray();
         return view('admin_page2.withdrawal_request', compact('member_tran'));
     }
@@ -179,14 +179,18 @@ class AdminController extends Controller
                 'status' => 1
             ];
 
-            $member_tran = MemberTransaction::where('woh_member_transaction',$request->woh_member_transaction)->get(['woh_member', 'tran_amount'])->toArray();
+            $member_tran = MemberTransaction::where('woh_member_transaction',$request->woh_member_transaction)->get(['woh_member', 'tran_amount', 'cd_payment'])->toArray();
             $member = new Member;
             $member = $member->where('woh_member',$member_tran[0]['woh_member'])->get()->toArray();
             if($member[0]['status'] == 0)
             {
                 $member_credit = MemberCredit::where('woh_member',$member[0]['woh_member'])->get()->toArray();
                 if($member_credit[0]['credit_amount'] > 0)
-                    \DB::table('woh_member_credit')->where(['woh_member'=>$member[0]['woh_member']])->update(['credit_amount'=>($member_credit[0]['credit_amount'] - ($member_tran[0]['tran_amount']/2))]);
+                    \DB::table('woh_member_credit')->where(['woh_member'=>$member[0]['woh_member']])->update(
+                        [
+                            'credit_amount'=>$member_credit[0]['credit_amount'] - ($member_tran[0]['cd_payment'])
+                        ]
+                    );
 
                 $member_credit2 = MemberCredit::where('woh_member',$member[0]['woh_member'])->get()->toArray();
                 if(!empty($member_credit2) && $member_credit2[0]['credit_amount'] == 0)

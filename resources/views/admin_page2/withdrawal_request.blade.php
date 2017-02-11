@@ -24,17 +24,25 @@
                                     <th style="text-align: right">Amount</th>
                                     <th style="text-align: right">Tax</th>
                                     <th style="text-align: right">CD Payment</th>
+                                    <th style="text-align: right">Change</th>
                                     <th style="text-align: right">Check Amt</th>
                                     <th class="td-actions">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @if(isset($member_tran))
-                                    <?php $withdrawals = 0;  $tax = 0; $cd_payment = 0; ?>
+                                    <?php $withdrawals = 0;  $tax = 0; $cd_payment = 0; $check_amt = 0; $change = 0; ?>
                                     @foreach($member_tran as $key => $mt)
                                         <?php $withdrawals += $mt['tran_amount']; ?>
                                         <?php $tax += $mt['tax']; ?>
                                         <?php $cd_payment += $mt['cd_payment']; ?>
+                                        <?php $change += $mt['change']; ?>
+                                        <?php
+                                            if(isset($mt['cd_payment']) && $mt['cd_payment'] > 0)
+                                                $check_amt += ($mt['tran_amount']-$mt['tax'])/2;
+                                            else
+                                                $check_amt += $mt['tran_amount']-$mt['tax'];
+                                        ?>
                                         <tr>
                                             <td>{!! $mt['woh_member_transaction'] !!}</td>
                                             <td>{!! $mt['first_name'] !!} {!! $mt['last_name'] !!}</td>
@@ -53,7 +61,12 @@
                                             <td style="text-align: right">&#8369; {!! number_format($mt['tran_amount'],2) !!}</td>
                                             <td style="text-align: right">&#8369; {!! number_format($mt['tax'],2) !!}</td>
                                             <td style="text-align: right">&#8369; {!! number_format($mt['cd_payment'],2) !!}</td>
-                                            <td style="text-align: right">&#8369; {!! number_format((($mt['tran_amount']/2)-$mt['tax']),2) !!}</td>
+                                            <td style="text-align: right">&#8369; {!! number_format($mt['change'],2) !!}</td>
+                                            @if(isset($mt['cd_payment']) && $mt['cd_payment'] > 0)
+                                                <td style="text-align: right">&#8369; {!! number_format((($mt['tran_amount']-$mt['tax'])/2)+$mt['change'],2) !!}</td>
+                                            @else
+                                                <td style="text-align: right">&#8369; {!! number_format(($mt['tran_amount']-$mt['tax']),2) !!}</td>
+                                            @endif
                                             <td class="td-actions">
                                                 <a href="" class="btn btn-small btn-success approve"  data-woh_member_transaction="{!! $mt['woh_member_transaction'] !!}" data-action="approve">
                                                     <i class="btn-icon-only icon-ok"> </i>
@@ -70,7 +83,8 @@
                                     <td style="text-align: right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
                                     <td style="text-align: right"><b>&#8369; {{ number_format($tax,2) }}</b></td>
                                     <td style="text-align: right"><b>&#8369; {{ number_format($cd_payment,2) }}</b></td>
-                                    <td style="text-align: right"><b>&#8369; {{ number_format((($withdrawals/2)-$tax),2) }}</b></td>
+                                    <td style="text-align: right"><b>&#8369; {{ number_format($change,2) }}</b></td>
+                                    <td style="text-align: right"><b>&#8369; {{ number_format($check_amt + $change,2) }}</b></td>
                                     <td class="td-actions"> </td>
                                 </tr>
                                 </tbody>

@@ -298,7 +298,7 @@ class MemberController extends Controller
                 MemberTransaction::create($tran_data);
 
                 $pair_dl = new Member;
-                $pair_dl = $pair_dl->where('downline_of',$request->downline_of)->get()->toArray();
+                $pair_dl = $pair_dl->where(['downline_of'=>$request->downline_of, 'status' => 1])->get()->toArray();
                 if($pair_dl && count($pair_dl) == 2)
                 {
                     $tran_data = [
@@ -490,13 +490,27 @@ class MemberController extends Controller
         {
             $member = new Member;
             $member = $member->where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
+            $cd_payment = null;
+            $change = null;
+            if($member[0]['status'] == 0)
+            {
+                $member_credit = MemberCredit::where('woh_member',$member[0]['woh_member'])->get()->toArray();
+                if($member_credit[0]['credit_amount'] < (($request->amount-($request->amount * 0.1))/2))
+                {
+                    $cd_payment = $member_credit[0]['credit_amount'];
+                    $change = (($request->amount-($request->amount * 0.1))/2) - $member_credit[0]['credit_amount'];
+                }
+                else
+                    $cd_payment = (($request->amount-($request->amount * 0.1))/2);
+            }
             $tran_data = [
                 "woh_member" => $request->woh_member,
                 "woh_transaction_type" => 1,
                 "transaction_date" => Carbon::now(),
                 "tran_amount" => $request->amount,
                 "tax" => ($request->amount * 0.1),
-                "cd_payment" => ($member[0]['status'] == 0) ? ($request->amount/2) : null,
+                "cd_payment" => $cd_payment,
+                "change" => $change,
                 "notes" => $request->notes,
                 'status' => 2
             ];
