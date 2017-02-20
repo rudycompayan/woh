@@ -65,7 +65,7 @@ class MemberController extends Controller
             {
                 if($downline[0]['tree_position'] == "right")
                 {
-                    $downline_li .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"left\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+                    $downline_li .= "\n<li><a class='empty_node' data-cur_level = '1' data-woh_member='{$upline}' data-position=\"left\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
                     $downline_li .= "\n<li><a class='with_node' data-level=\"1-r\"><span class=\"span\">{$downline[0]['woh_member']}-{$downline[0]['username']}</span><img src=\"member_page/images/{$downline[0]['picture']}\" alt=\"Raspberry\"/></a>";
                     $level_data = [
                         "parent_member" => $upline,
@@ -95,7 +95,7 @@ class MemberController extends Controller
                         DownlineLevel::create($level_data);
                     $downline_li .= $this->downline_all($downline[0]['woh_member'], 1, 'left', $upline);
                     $downline_li .= "</li>";
-                    $downline_li .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"right\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+                    $downline_li .= "\n<li><a class='empty_node' data-cur_level = '1' data-woh_member='{$upline}' data-position=\"right\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
                 }
             }
         }
@@ -147,7 +147,7 @@ class MemberController extends Controller
             {
                 if($downline[0]['tree_position'] == "right")
                 {
-                    $box .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"left\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+                    $box .= "\n<li><a class='empty_node' data-cur_level = '{$level}' data-woh_member='{$upline}' data-position=\"left\" data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
                     $box .= "\n<li><a class='with_node'><span class=\"span\">{$downline[0]['woh_member']}-{$downline[0]['username']}</span><img src=\"member_page/images/{$downline[0]['picture']}\" alt=\"Raspberry\"/></a>";
                     $level_data = [
                         "parent_member" => $sponsor,
@@ -177,15 +177,15 @@ class MemberController extends Controller
                         DownlineLevel::create($level_data);
                     $box .= $this->downline_all($downline[0]['woh_member'], $level, $main_pos, $sponsor);
                     $box .= "</li>";
-                    $box .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"right\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+                    $box .= "\n<li><a class='empty_node' data-cur_level = '{$level}'  data-woh_member='{$upline}' data-position=\"right\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
                 }
             }
 
         }
         else
         {
-            $box .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"left\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
-            $box .= "\n<li><a class='empty_node' data-woh_member='{$upline}' data-position=\"right\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+            $box .= "\n<li><a class='empty_node' data-cur_level = '{$level}'  data-woh_member='{$upline}' data-position=\"left\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
+            $box .= "\n<li><a class='empty_node' data-cur_level = '{$level}'  data-woh_member='{$upline}' data-position=\"right\" data-level='{$level}-{$main_pos}' data-username=\"{$upline_data[0]['username']}\"><img src=\"member_page/images/offline.png\" alt=\"Raspberry\"/></a></li>";
         }
         $box .= "\n</ul>";
         return $box;
@@ -280,7 +280,8 @@ class MemberController extends Controller
             "username" => $request->username,
             "password" => $request->password,
             "status" => $request->account_type == 'entry_code' ? 1 : 0,
-            "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null
+            "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
+            "level" => $request->level
             ];
         $member = Member::create($data);
         if (!empty($member))
@@ -293,7 +294,8 @@ class MemberController extends Controller
                     "transaction_date" => Carbon::now(),
                     "tran_amount" => 200,
                     "transaction_referred" => $member->woh_member,
-                    'status' => 1
+                    'status' => 1,
+                    "level" => $request->level
                 ];
                 MemberTransaction::create($tran_data);
 
@@ -373,7 +375,8 @@ class MemberController extends Controller
 
         $member_trans = new MemberTransaction;
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-            ->where('woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
+            ->join('woh_member','woh_member.woh_member', '=', 'woh_member_transaction.transaction_referred')
+            ->where('woh_member_transaction.woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
 
         $member_credit = MemberCredit::where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
 

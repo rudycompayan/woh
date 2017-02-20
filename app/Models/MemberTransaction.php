@@ -23,6 +23,7 @@ class MemberTransaction extends Model
         "cd_payment",
         "status",
         "admin_notes",
-        "change"
+        "change",
+        "level"
     ];
 }

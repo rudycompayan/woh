@@ -22,6 +22,7 @@ class Member extends Model
         "username",
         "password",
         "status",
-        "cd_code"
+        "cd_code",
+        "level"
     ];
 }

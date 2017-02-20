@@ -31,16 +31,16 @@
                                             </p>
                                         </div>
                                     </li>
-                                    <li style="width: 100%; border: none; margin-bottom: 0px;">
+                                    <li style="width: 100%; border: none; margin-bottom: 0px; display: none">
                                         <div class="news-item-detail">
                                             <label href="#" class="news-item-title" target="_blank">GC Name</label>
-                                            <p class="news-item-preview"><input type="text" name="gc_name" style="width: 86%;"></p>
+                                            <p class="news-item-preview"><input type="text" value="500 pesos worth of GC" name="gc_name" style="width: 86%;"></p>
                                         </div>
                                     </li>
-                                    <li style="width: 100%; border: none; margin-bottom: 0px">
+                                    <li style="width: 100%; border: none; margin-bottom: 0px; display: none">
                                         <div class="news-item-detail">
                                             <label href="#" class="news-item-title" target="_blank">GC Description</label>
-                                            <p class="news-item-preview"><input type="text" name="gc_description" style="width: 86%;"></p>
+                                            <p class="news-item-preview"><input type="text" value="500 pesos worth of GC" name="gc_description" style="width: 86%;"></p>
                                         </div>
                                     </li>
                                     <li style="width: 100%; border: none; margin-bottom: 0px">
@@ -81,39 +81,43 @@
                             <h3>Gift Certificate Preview (Sample)</h3>
                         </div>
                         <!-- /widget-header -->
-                        <div class="widget-content" style="overflow: auto; height: 480px" id="print-element">
+                        <div class="widget-content" style="overflow: auto; height: 340px" id="print-element">
                             @if(!empty($gc))
                                 @foreach($gc as $g)
-                                    <table width="100%" height="90%" border="0" style="background-image: url('admin_page/img/gc_mockup.png'); background-repeat: no-repeat; background-position: center center;">
+                                    <table width="100%" height="0%" border="0" style="background-size: 98%;background-image: url('admin_page/img/gc_mockup2.png'); background-repeat: no-repeat; background-position: center center;">
                                         <tr>
-                                            <td align="center">
-                                                <table border="0" style="width: 80%!important;font-size: 16px;margin-top: 160px;">
+                                            <td align="center" style="border-bottom: 1px dotted #000000">
+                                                <table border="0" style="width: 95%!important;font-size: 16px;margin: 63px 0px;">
                                                     <tr>
-                                                        <td colspan="2">To: <b>{!! $g['to'] !!}</b></td>
+                                                        <td colspan="2"><img src="data:image/png;base64, {!! \Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG($g['bar_code'], "C39",1,33) !!}" alt="barcode" /></td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="2">From: <b>Windows Of Heaven</b></td>
+                                                        <td colspan="2" align="left" style="letter-spacing: 11px; text-align: left"><small> {!! $g['bar_code'] !!}</small></td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="2">Amount: <b>&#8369; {!! $g['amount'] !!}</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" style="height: 40px"></td>
+                                                        <td colspan="2" style="height: 10px"></td>
                                                     </tr>
                                                     <tr>
                                                         @if(isset($g['entry_code']))
-                                                            <td>ENTRY CODE: <b>{!! $g['entry_code'] !!}</b></td>
+                                                            <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff;"><b>ENTRY CODE:</b> </font><b>{!! $g['entry_code'] !!}</b></td>
                                                         @elseif(isset($g['cd_code']))
-                                                            <td>CD CODE: <b>{!! $g['cd_code'] !!}</b></td>
+                                                            <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>CD CODE:</b> </font> <b>{!! $g['cd_code'] !!}</b></td>
                                                         @else
-                                                            <td>&nbsp;</td>
+                                                            <td colspan="2">&nbsp;</td>
                                                         @endif
-                                                        <td align="right"><img src="data:image/png;base64, {!! \Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG($g['bar_code'], "C39",1,33) !!}" alt="barcode" /></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?= (isset($g['pin_code']) ? " PIN CODE: <b>".$g['pin_code']."</b>"  : "&nbsp;") ?></td>
-                                                        <td align="right" style="letter-spacing: 9px; text-align: right"><small> {!! $g['bar_code'] !!}</small></td>
+                                                        <td colspan="2"><?= (isset($g['pin_code']) ? " <font style=\"color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff\"><b>PIN CODE:</b> </font> <b>".$g['pin_code']."</b>"  : "&nbsp;") ?></td>
                                                     </tr>
+                                                    <tr>
+                                                        <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>To:</b></font> <b>{!! $g['to'] !!}</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" align="center" style="font-size: 80px;padding-bottom: 30px;-webkit-text-stroke: 1px #000000; color:#ff2d2d; font-family: 'Times New Roman'"><b>&#8369;{!! number_format($g['amount']) !!}</b></td>
+                                                    </tr>
+                                                    <!--tr>
+                                                        <td colspan="2">From: <b>Windows Of Heaven</b></td>
+                                                    </tr-->
                                                 </table>
                                             </td>
                                         </tr>

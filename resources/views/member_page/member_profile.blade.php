@@ -178,6 +178,7 @@
                 if($(this).data('woh_member')) {
                     $('#upline_selected').val($(this).data('woh_member'));
                     $('#tree_position').val($(this).data('position'));
+                    $('#level').val($(this).data('cur_level'));
                     $('#downline_of option').remove();
                     $('#downline_of')
                             .append($("<option></option>")
@@ -357,8 +358,8 @@
             @if($downlines)
                 {!! $downlines !!}
             @else
-                <li><a class='empty_node' data-woh_member='{!! $member[0]->woh_member !!}' data-position="left" data-level="0-l" data-username='{!! $member[0]->username !!}'><img src="member_page/images/offline.png" alt="Raspberry"/></a></li>
-                <li><a class='empty_node' data-woh_member='{!! $member[0]->woh_member !!}' data-position="right" data-level="0-r" data-username='{!! $member[0]->username !!}'><img src="member_page/images/offline.png" alt="Raspberry"/></a></li>
+                <li><a class='empty_node' data-cur_level = '1'  data-woh_member='{!! $member[0]->woh_member !!}' data-position="left" data-level="0-l" data-username='{!! $member[0]->username !!}'><img src="member_page/images/offline.png" alt="Raspberry"/></a></li>
+                <li><a class='empty_node' data-cur_level = '1'  data-woh_member='{!! $member[0]->woh_member !!}' data-position="right" data-level="0-r" data-username='{!! $member[0]->username !!}'><img src="member_page/images/offline.png" alt="Raspberry"/></a></li>
             @endif
         </ul>
     </li>
@@ -531,6 +532,7 @@
             <label for="cd_code" class="cd">CD Code</label>
             <input type="text" name="cd_code" id="cd_code" placeholder="xxxxxxxxxxxxxx" class="text ui-widget-content ui-corner-all cd">
             <input type="hidden" id="upline_selected" value="{!! $member[0]->woh_member !!}">
+            <input type="hidden" id="level" name="level">
             <input type="hidden" id="status" value="1">
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
