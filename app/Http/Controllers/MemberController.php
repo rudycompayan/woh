@@ -375,7 +375,6 @@ class MemberController extends Controller
 
         $member_trans = new MemberTransaction;
         $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
-            ->join('woh_member','woh_member.woh_member', '=', 'woh_member_transaction.transaction_referred')
             ->where('woh_member_transaction.woh_member',$request->session()->get('woh_member'))->orderBy('woh_member_transaction','asc')->get()->toArray();
 
         $member_credit = MemberCredit::where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
@@ -410,13 +409,13 @@ class MemberController extends Controller
                     $member_tran[] = [
                         "woh_member_transaction" => "----------",
                         "woh_member" => null,
-                        "woh_transaction_type" => 5,
+                        "woh_transaction_type" => ($x%5==0) ? 4 : 5,
                         "transaction_date" => Carbon::now(),
-                        "tran_amount" => ($total_counts * 200),
+                        "tran_amount" => ($x%5==0) ? 500 : ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 500 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }
@@ -472,13 +471,13 @@ class MemberController extends Controller
                     $member_tran[] = [
                         "woh_member_transaction" => "----------",
                         "woh_member" => null,
-                        "woh_transaction_type" => 5,
+                        "woh_transaction_type" => ($x%5==0) ? 4 : 5,
                         "transaction_date" => Carbon::now(),
-                        "tran_amount" => ($total_counts * 200),
+                        "tran_amount" => ($x%5==0) ? 500 : ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 500 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }

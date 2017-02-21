@@ -257,6 +257,7 @@
         {
             alert(err_msg);
             $('#generate').hide();
+            location.href ='/short_codes';
         }
         else
             $('#generate').show();

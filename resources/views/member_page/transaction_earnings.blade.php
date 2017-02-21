@@ -184,6 +184,7 @@
                             <?php
                             $earn = 0;
                             $withdrawals = 0;
+                            $gc = 0;
                             krsort($member_tran);
                             ?>
                             @foreach($member_tran as $key => $mt)
@@ -191,8 +192,10 @@
                                 if($mt['woh_transaction_type'] == 1)
                                     if($mt['status'] !=3)
                                         $withdrawals += $mt['tran_amount'];
-                                if($mt['woh_transaction_type'] != 1)
+                                if($mt['woh_transaction_type'] != 1 && $mt['woh_transaction_type'] != 4)
                                     $earn += $mt['tran_amount'];
+                                if($mt['woh_transaction_type'] == 4)
+                                    $gc += $mt['tran_amount'];
                                 ?>
                                 <tr style="background-color: @if($key%2==0) #efefef @else #ffffff @endif;">
                                     <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif">
@@ -230,17 +233,26 @@
             </td>
         </tr>
         <tr style="color: #2b542c">
-            <td class='rows' colspan="4"  style="color: #2b542c; border-top: 1px solid lightgray">Total Earned ==></td>
+            <td class='rows' colspan="4"  style="color: #2b542c; border-top: 1px solid lightgray">Current Balance ==></td>
             <td class='rows'  style="color: #2b542c; border-top: 1px solid lightgray"></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><b>&#8369; {{ number_format($earn,2) }}</b></td>
         </tr>
-        <tr style="color: #761c19">
+        <tr style="color: #2b542c;background-color: #efefef">
+            <td class='rows' colspan="4"  style="color: #2b542c;">Total Gc's ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><b>{{ number_format($gc/500) }} X &#8369; 500 = &#8369; {{ number_format($gc,2) }}</b></td>
+        </tr>
+        <tr style="color: #2b542c">
+            <td class='rows' colspan="4"  style="color: #2b542c;">Total Earned ==></td>
+            <td class='rows'  style="color: #2b542c;"></td>
+            <td class='rows' align="right" style="color: #2b542c;"><b>&#8369; {{ number_format(($earn+$gc),2) }}</b></td>
+        </tr>
+        <tr style="color: #761c19;background-color: #efefef">
             <td class='rows' colspan="4">Total Withdrawals ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><b>&#8369; {{ number_format($withdrawals,2) }}</b></td>
         </tr>
         @if(!empty($member_credit))
-        <tr style="color: #761c19">
+        <tr style="color: #761c19; background-color: #efefef">
             <td class='rows' colspan="4">CD Account Credit ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><b>&#8369; {{ number_format($member_credit[0]['credit_amount'],2) }}</b></td>

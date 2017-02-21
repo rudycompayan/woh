@@ -350,22 +350,25 @@
                             $cd_deduction = 0;
                             $check_amt = 0;
                             $change = 0;
+                            $gc = 0;
                             krsort($member_tran);
                             ?>
                             @foreach($member_tran as $key => $mt)
                                 <?php
                                 if($mt['woh_transaction_type'] == 1 && $mt['status'] != 3)
                                     $withdrawals += $mt['tran_amount'];
-                                elseif($mt['woh_transaction_type'] != 1)
+                                elseif($mt['woh_transaction_type'] != 1 && $mt['woh_transaction_type'] != 4)
                                     $earn += $mt['tran_amount'];
+                                if($mt['woh_transaction_type'] == 4)
+                                    $gc += $mt['tran_amount'];
                                 if($mt['woh_transaction_type'] == 1 && $mt['status'] != 3)
                                 {
                                     $tax += !empty($mt['tax']) ? $mt['tax'] : 0;
                                     $cd_deduction += !empty($mt['cd_payment']) ? $mt['cd_payment'] : 0;
                                 }
-                                if($mt['woh_transaction_type'] == 1 && isset($mt['cd_payment']) && $mt['cd_payment'] > 0)
+                                if($mt['woh_transaction_type'] == 1 && isset($mt['cd_payment']) && $mt['cd_payment'] > 0 && $mt['status'] != 3)
                                     $check_amt += ($mt['tran_amount']-$mt['tax'])/2;
-                                elseif($mt['woh_transaction_type'] == 1 && !isset($mt['cd_payment']))
+                                elseif($mt['woh_transaction_type'] == 1 && !isset($mt['cd_payment']) && $mt['status'] != 3)
                                     $check_amt += $mt['tran_amount']-$mt['tax'];
                                 if($mt['woh_transaction_type'] == 1)
                                     $change += $mt['change'];
@@ -422,6 +425,15 @@
             <td class='rows'  style="color: #2b542c; border-top: 1px solid lightgray"></td>
             <td class='rows' align="right" style="color: #2b542c; border-top: 1px solid lightgray"><span class="totals"><b>&#8369; {{ number_format($earn,2) }}</b></span></td>
         </tr>
+        <tr style="color: #2b542c;background-color: #efefef">
+            <td class='rows' colspan="10"  style="color: #2b542c;">Total Gc's ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals"><b>{{ number_format($gc/500) }} X &#8369; 500 = &#8369; {{ number_format($gc,2) }}</b></span></td>
+        </tr>
+        <tr style="color: #2b542c;">
+            <td class='rows' colspan="10"  style="color: #2b542c;">Total Earnings ==></td>
+            <td class='rows'  style="color: #2b542c;"></td>
+            <td class='rows' align="right" style="color: #2b542c;"><span class="totals"><b>&#8369; {{ number_format(($earn+$gc),2) }}</b></span></td>
+        </tr>
         <tr style="color: #761c19; background-color: #efefef">
             <td class='rows' colspan="10">Total Withdrawals ==></td>
             <td class='rows'></td>
@@ -440,7 +452,7 @@
         </tr>
         @endif
         <tr style="color: #2a6496;  background-color: #efefef">
-            <td class='rows' colspan="10">Remaining Balance ==></td>
+            <td class='rows' colspan="10">Withdrawable Balance ==></td>
             <td class='rows'></td>
             <td class='rows' align="right"><span class="totals-b"><b id="savings">&#8369; {{ number_format(($earn-$withdrawals),2) }}</b></span></td>
         </tr>
