@@ -43,7 +43,9 @@
                                                         <input id="Field" name="type[3]" type="checkbox" class="field login-checkbox" value="3" tabindex="3" />
                                                         CD Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['cd_count'] !!}</span>) <span style="color:#9d261d;">codes left</span> <br>
                                                         <input id="Field" name="type[4]" type="checkbox" class="field login-checkbox" value="4" tabindex="3" />
-                                                        Bar Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['bar_count'] !!}</span>) <span style="color:#9d261d;">codes left</span>
+                                                        Bar Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['bar_count'] !!}</span>) <span style="color:#9d261d;">codes left</span> <br>
+                                                        <input id="Field" name="type[5]" type="checkbox" class="field login-checkbox" value="5" tabindex="4" />
+                                                        Product Codes (<span style="color:#3c763d; font-weight: bold">{!! $short_codes_count['product_code_count'] !!}</span>) <span style="color:#9d261d;">codes left</span>
                                                     </span>
                                                     <div class="field">
                                                         <br>

@@ -56,6 +56,7 @@
                                                  <tr>
                                                      <td class="checkbox entry"><input type="radio" class="code" name="code" value="1"> Entry Code</td>
                                                      <td class="checkbox entry"><input type="radio" class="code"  name="code" value="2"> CD Code</td>
+                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="5"> Product Code</td>
                                                  </tr>
                                                  <tr>
                                                      <td colspan="3"><input type="text" name="gc_number" placeholder="No of GC to produce"></td>
@@ -102,6 +103,8 @@
                                                     <tr>
                                                         @if(isset($g['entry_code']))
                                                             <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff;"><b>ENTRY CODE:</b> </font><b>{!! $g['entry_code'] !!}</b></td>
+                                                        @elseif(isset($g['product_code']))
+                                                            <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>PRODUCT CODE:</b> </font> <b>{!! $g['product_code'] !!}</b></td>
                                                         @elseif(isset($g['cd_code']))
                                                             <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>CD CODE:</b> </font> <b>{!! $g['cd_code'] !!}</b></td>
                                                         @else
@@ -245,6 +248,9 @@
         @endif
         @if(!empty($short_codes_count) && $short_codes_count['bar_count'] < 4)
             err_msg = err_msg + "Bar code is running out. Please generate!\n";
+        @endif
+         @if(!empty($short_codes_count) && $short_codes_count['product_code_count'] == 0)
+                err_msg = err_msg + "Product code is running out. Please generate!\n";
         @endif
 
         if(err_msg)

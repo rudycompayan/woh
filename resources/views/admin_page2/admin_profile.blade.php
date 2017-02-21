@@ -67,7 +67,7 @@
                                 </a>
                                 <a href="javascript:;" class="shortcut">
                                     <i class="shortcut-icon icon-signal"></i>
-                                    <span class="shortcut-label">Members</span>
+                                    <span class="shortcut-label">KLP Members</span>
                                 </a>
                                 <a href="javascript:;" class="shortcut">
                                     <i class="shortcut-icon icon-comment"></i>
@@ -268,12 +268,6 @@
                     start: new Date(y, m, d+1, 19, 0),
                     end: new Date(y, m, d+1, 22, 30),
                     allDay: false
-                },
-                {
-                    title: 'EGrappler.com',
-                    start: new Date(y, m, 28),
-                    end: new Date(y, m, 29),
-                    url: 'http://EGrappler.com/'
                 }
             ]
         });

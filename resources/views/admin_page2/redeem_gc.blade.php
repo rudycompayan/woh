@@ -83,6 +83,8 @@
                                                             <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff;"><b>ENTRY CODE:</b> </font><b>{!! $g['entry_code'] !!}</b></td>
                                                         @elseif(isset($g['cd_code']))
                                                             <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>CD CODE:</b> </font> <b>{!! $g['cd_code'] !!}</b></td>
+                                                        @elseif(isset($g['product_code']))
+                                                            <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>PRODUCT CODE:</b> </font> <b>{!! $g['product_code'] !!}</b></td>
                                                         @else
                                                             <td colspan="2">&nbsp;</td>
                                                         @endif

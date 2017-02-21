@@ -88,11 +88,13 @@ class AdminController extends Controller
         $pin_code = ShortCodes::where(['type'=>2, 'status'=>0])->count();
         $cd_code = ShortCodes::where(['type'=>3, 'status'=>0])->count();
         $bar_code = ShortCodes::where(['type'=>4, 'status'=>0])->count();
+        $product_code = ShortCodes::where(['type'=>5, 'status'=>0])->count();
         $short_codes_count = [
             'entry_count' => $entry_code,
             'pin_count' => $pin_code,
             'cd_count' => $cd_code,
-            'bar_count' => $bar_code
+            'bar_count' => $bar_code,
+            'product_code_count' => $product_code
         ];
         return view('admin_page2.short_codes', compact('short_codes_count'));
     }
@@ -127,11 +129,13 @@ class AdminController extends Controller
         $pin_code = ShortCodes::where(['type'=>2, 'status'=>0])->count();
         $cd_code = ShortCodes::where(['type'=>3, 'status'=>0])->count();
         $bar_code = ShortCodes::where(['type'=>4, 'status'=>0])->count();
+        $product_code = ShortCodes::where(['type'=>5, 'status'=>0])->count();
         $short_codes_count = [
             'entry_count' => $entry_code,
             'pin_count' => $pin_code,
             'cd_count' => $cd_code,
-            'bar_count' => $bar_code
+            'bar_count' => $bar_code,
+            'product_code_count' => $product_code
         ];
         return view('admin_page2.short_codes', compact('error_msg', 'short_codes_count'));
     }
@@ -147,11 +151,13 @@ class AdminController extends Controller
         $pin_code = ShortCodes::where(['type'=>2, 'status'=>0])->count();
         $cd_code = ShortCodes::where(['type'=>3, 'status'=>0])->count();
         $bar_code = ShortCodes::where(['type'=>4, 'status'=>0])->count();
+        $product_code = ShortCodes::where(['type'=>5, 'status'=>0])->count();
         $short_codes_count = [
             'entry_count' => $entry_code,
             'pin_count' => $pin_code,
             'cd_count' => $cd_code,
-            'bar_count' => $bar_code
+            'bar_count' => $bar_code,
+            'product_code_count' => $product_code
         ];
         $gc = GiftCertificate::where('status','<>',2)->where('printed',0)->orderBy('woh_gc','desc')->get()->toArray();
         return view('admin_page2.gift_certificate', compact('gc','short_codes_count'));
@@ -264,12 +270,15 @@ class AdminController extends Controller
         $pin_code = ShortCodes::where(['status'=>0, 'type'=>2])->get()->toArray();
         $cd_code = ShortCodes::where(['status'=>0, 'type'=>3])->get()->toArray();
         $bar_code = ShortCodes::where(['status'=>0, 'type'=>4])->get()->toArray();
+        $product_code = ShortCodes::where(['status'=>0, 'type'=>5])->get()->toArray();
 
         for($x=1; $x<= $request->gc_number; $x++)
         {
             $status = 0;
             if($request->code == 2)
                 $status = 3;
+            elseif(isset($request->code) && $request->code == 5)
+                $status = 1;
             elseif(!isset($request->code))
                 $status = 1;
             $data = [
@@ -282,6 +291,7 @@ class AdminController extends Controller
                 'pin_code' => ($request->code ? $pin_code[0]['code'] : null),
                 'entry_code'=>($request->code == 1 ? $entry_code[0]['code'] : null),
                 'cd_code'=>($request->code == 2 ? $cd_code[0]['code'] : null),
+                'product_code'=>($request->code == 5 ? $product_code[0]['code'] : null),
                 'status' => $status,
             ];
             GiftCertificate::create($data);

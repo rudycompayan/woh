@@ -19,6 +19,7 @@ class GiftCertificate extends Model
         'pin_code',
         'entry_code',
         'cd_code',
+        'product_code',
         'status',
         'date_created',
         'printed'
