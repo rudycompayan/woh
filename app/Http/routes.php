@@ -16,6 +16,8 @@ Route::get('/contact', 'HomepageController@contact_page');
 Route::get('/gallery', 'HomepageController@gallery_page');
 Route::get('/about', 'HomepageController@about_page');
 
+Route::post('/contact', 'HomepageController@post_contact_page');
+
 Route::get('/admin_profile', 'AdminController@admin_profile');
 Route::get('/admin_login', 'AdminController@admin_login');
 Route::get('/admin_profile/logout', 'AdminController@admin_logout');
@@ -29,6 +31,7 @@ Route::post('/short_codes', 'AdminController@post_short_codes');
 Route::post('/withdrawal_request_update', 'AdminController@post_withdrawal_request_update');
 Route::post('/gift_certificates', 'AdminController@post_gift_certificates');
 Route::post('/redeem_gc', 'AdminController@post_redeem_gc');
+Route::post('/print_gc', 'AdminController@post_print_gc');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

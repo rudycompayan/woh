@@ -20,6 +20,7 @@ class GiftCertificate extends Model
         'entry_code',
         'cd_code',
         'status',
-        'date_created'
+        'date_created',
+        'printed'
     ];
 }

@@ -65,7 +65,7 @@
                                     </li>
                                     <li style="width: 100%">
                                         <div class="news-item-detail">
-                                            <button class="button btn btn-primary btn-large" onclick="this.form.submit()">Generate</button>
+                                            <button class="button btn btn-primary btn-large" id="generate" onclick="this.form.submit()">Generate</button>
                                             <a href="{{action('AdminController@gift_certificates')}}"><button class="button btn btn-primary btn-large">Refresh</button></a>
                                         </div>
                                     </li>
@@ -78,12 +78,14 @@
                 <div class="span8">
                     <div class="widget widget-nopad">
                         <div class="widget-header"> <i class="icon-list-alt"></i>
-                            <h3>Gift Certificate Preview (Sample)</h3>
+                            <h3>Gift Certificate Preview</h3>
                         </div>
                         <!-- /widget-header -->
+                        <?php $gc_param = []; ?>
                         <div class="widget-content" style="overflow: auto; height: 340px" id="print-element">
                             @if(!empty($gc))
                                 @foreach($gc as $g)
+                                    <?php $gc_param[] = $g['woh_gc']; ?>
                                     <table width="100%" height="0%" border="0" style="background-size: 98%;background-image: url('admin_page/img/gc_mockup2.png'); background-repeat: no-repeat; background-position: center center;">
                                         <tr>
                                             <td align="center" style="border-bottom: 1px dotted #000000">
@@ -199,7 +201,21 @@
 
         $("#print").click(function(e){
             e.preventDefault();
-            printContent2('print-element');
+            $.ajax({
+                type: "POST",
+                url: "{{action('AdminController@post_print_gc')}}",
+                data: {'woh_gc' : '{!! implode('-',$gc_param) !!}' },
+                success: function(data, NULL, jqXHR) {
+                    $('#ajax-loader').fadeOut();
+                    if(jqXHR.status === 200 ) {//redirect if  authenticated user.
+                        printContent2('print-element');
+                        $('#print-element').text('');
+                    }
+                },
+                error: function(data) {
+                    alert("No GC found!");
+                }
+            });
         });
 
         function printContent2(div_id)
@@ -215,6 +231,30 @@
             map_src.focus();
             map_src.print();
         }
+
+        var err_msg ='';
+
+        @if(!empty($short_codes_count) && $short_codes_count['entry_count'] == 0)
+            err_msg = err_msg + "Entry code is running out. Please generate!\n";
+        @endif
+        @if(!empty($short_codes_count) && $short_codes_count['cd_count'] == 0)
+            err_msg = err_msg + "CD code is running out. Please generate!\n";
+        @endif
+        @if(!empty($short_codes_count) && $short_codes_count['pin_count'] == 0)
+            err_msg = err_msg + "Pin code is running out. Please generate!\n";
+        @endif
+        @if(!empty($short_codes_count) && $short_codes_count['bar_count'] < 4)
+            err_msg = err_msg + "Bar code is running out. Please generate!\n";
+        @endif
+
+        if(err_msg)
+        {
+            alert(err_msg);
+            $('#generate').hide();
+        }
+        else
+            $('#generate').show();
+
     });
 </script>
 @endsection

@@ -143,8 +143,18 @@ class AdminController extends Controller
             $redirect = action('HomepageController@index');
             return redirect($redirect);
         }
-        $gc = GiftCertificate::orderBy('woh_gc','desc')->get()->toArray();
-        return view('admin_page2.gift_certificate', compact('gc'));
+        $entry_code = ShortCodes::where(['type'=>1, 'status'=>0])->count();
+        $pin_code = ShortCodes::where(['type'=>2, 'status'=>0])->count();
+        $cd_code = ShortCodes::where(['type'=>3, 'status'=>0])->count();
+        $bar_code = ShortCodes::where(['type'=>4, 'status'=>0])->count();
+        $short_codes_count = [
+            'entry_count' => $entry_code,
+            'pin_count' => $pin_code,
+            'cd_count' => $cd_code,
+            'bar_count' => $bar_code
+        ];
+        $gc = GiftCertificate::where('status','<>',2)->where('printed',0)->orderBy('woh_gc','desc')->get()->toArray();
+        return view('admin_page2.gift_certificate', compact('gc','short_codes_count'));
     }
 
     public function redeem_gc(Request $request)
@@ -257,6 +267,11 @@ class AdminController extends Controller
 
         for($x=1; $x<= $request->gc_number; $x++)
         {
+            $status = 0;
+            if($request->code == 2)
+                $status = 3;
+            elseif(!isset($request->code))
+                $status = 1;
             $data = [
                 'to' => $request->gc_to,
                 'gc_name' => $request->gc_name,
@@ -267,7 +282,7 @@ class AdminController extends Controller
                 'pin_code' => ($request->code ? $pin_code[0]['code'] : null),
                 'entry_code'=>($request->code == 1 ? $entry_code[0]['code'] : null),
                 'cd_code'=>($request->code == 2 ? $cd_code[0]['code'] : null),
-                'status' => ($request->code == 2 ? 3 : 0),
+                'status' => $status,
             ];
             GiftCertificate::create($data);
 
@@ -310,6 +325,23 @@ class AdminController extends Controller
         else
             $error_msg = 'GC not registered! Please register to our KLP Marketing Team using this GC. Thank you!';
         return view('admin_page2.redeem_gc', compact('error_msg','success_msg','gc'));
+    }
+
+    public function post_print_gc(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        $woh = explode('-',$request->woh_gc);
+        if(!empty($woh))
+        {
+            foreach($woh as $w)
+                \DB::table('woh_gc')->where('woh_gc', $w)->update(['printed'=>1]);
+        }
+        return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
+        ->header('Content-Type', 'application/json');
     }
 
     private function generatePin( $number ) {

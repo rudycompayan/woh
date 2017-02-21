@@ -5,47 +5,42 @@
 <div class="content indent">
     <div class="container">
         <h2>Contact form</h2>
-        <form id="contact-form">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if($msg)
+            <div class="alert alert-success">
+                <ul>
+                    <li>{{ $msg }}</li>
+                </ul>
+            </div>
+        @endif
+        <form id="contact-form" method="POST" action="{{action('HomepageController@post_contact_page')}}">
             <div class="contact-form-loader"></div>
             <fieldset>
                 <label class="name form-div-1">
-                    <input type="text" name="name" placeholder="Name" value="" data-constraints="@Required @JustLetters"  />
-                    <span class="empty-message">*This field is required.</span>
-                    <span class="error-message">*This is not a valid name.</span>
+                    <input type="text" name="from_name" placeholder="Name"  />
                 </label>
                 <label class="phone form-div-2">
-                    <input type="text" name="phone" placeholder="Phone" value="" data-constraints="@JustNumbers" />
-                    <span class="empty-message">*This field is required.</span>
-                    <span class="error-message">*This is not a valid phone.</span>
+                    <input type="text" name="number" placeholder="Phone" />
                 </label>
                 <label class="email form-div-3">
-                    <input type="text" name="email" placeholder="Email" value="" data-constraints="@Required @Email" />
-                    <span class="empty-message">*This field is required.</span>
-                    <span class="error-message">*This is not a valid email.</span>
+                    <input type="text" name="from_email" placeholder="Email"  />
                 </label>
                 <label class="message form-div-4">
-                    <textarea name="message" placeholder="Message" data-constraints='@Required @Length(min=20,max=999999)'></textarea>
-                    <span class="empty-message">*This field is required.</span>
-                    <span class="error-message">*The message is too short.</span>
+                    <textarea name="message" placeholder="Message"></textarea>
                 </label>
                 <!-- <label class="recaptcha"><span class="empty-message">*This field is required.</span></label> -->
                 <div class="btns">
-                    <a href="#" data-type="submit" class="btn-default btn1" data-text="Send">Send</a>
+                    <a id="send" data-type="submit" class="btn-default btn1" data-text="Send">Send</a>
                 </div>
             </fieldset>
-            <div class="modal fade response-message">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title">Modal title</h4>
-                        </div>
-                        <div class="modal-body">
-                            You message has been sent! We will be in touch soon.
-                        </div>
-                    </div>
-                </div>
-            </div>
         </form>
     </div>
     <section class="content_map">
@@ -97,6 +92,12 @@
 <link rel="stylesheet" href="fonts/font-awesome.css">
 <script src='http://maps.googleapis.com/maps/api/js?key=AIzaSyB66kIZHfGP0FCDrEd3rIXegdiS0DXOO2w&v=3.exp&amp;sensor=false'></script>
 <script type="text/javascript">
+    $(document).ready(function(){
+       $('#send').click(function(e){
+           e.preventDefault();
+           $('#contact-form').submit();
+       });
+    });
     google_api_map_init();
     function google_api_map_init(){
         var map;
