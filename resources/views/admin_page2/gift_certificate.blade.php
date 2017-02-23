@@ -111,9 +111,11 @@
                                                             <td colspan="2">&nbsp;</td>
                                                         @endif
                                                     </tr>
+                                                    @if(isset($g['pin_code']))
                                                     <tr>
                                                         <td colspan="2"><?= (isset($g['pin_code']) ? " <font style=\"color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff\"><b>PIN CODE:</b> </font> <b>".$g['pin_code']."</b>"  : "&nbsp;") ?></td>
                                                     </tr>
+                                                    @endif
                                                     <tr>
                                                         <td colspan="2"><font style="color: #ff2d2d;-webkit-text-stroke: 0.5px #ffffff"><b>To:</b></font> <b>{!! $g['to'] !!}</b></td>
                                                     </tr>

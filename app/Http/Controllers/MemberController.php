@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
+use App\Models\Unilevel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -411,11 +412,11 @@ class MemberController extends Controller
                         "woh_member" => null,
                         "woh_transaction_type" => ($x%5==0) ? 4 : 5,
                         "transaction_date" => Carbon::now(),
-                        "tran_amount" => ($x%5==0) ? 500 : ($total_counts * 200),
+                        "tran_amount" => ($x%5==0) ? 600 : ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => ($x%5==0) ? "GC worth 500 pesos" : "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }
@@ -473,11 +474,11 @@ class MemberController extends Controller
                         "woh_member" => null,
                         "woh_transaction_type" => ($x%5==0) ? 4 : 5,
                         "transaction_date" => Carbon::now(),
-                        "tran_amount" => ($x%5==0) ? 500 : ($total_counts * 200),
+                        "tran_amount" => ($x%5==0) ? 600 : ($total_counts * 200),
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => ($x%5==0) ? "GC worth 500 pesos" : "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }
@@ -523,6 +524,28 @@ class MemberController extends Controller
 
         return response(['msg' => 'Member not found!'], 401) // 401 Status Code: Forbidden, needs authentication
         ->header('Content-Type', 'application/json');
+    }
 
+    public function post_member_unilevel(Request $request)
+    {
+        if ($request->session()->get('woh_member'))
+        {
+            $member = new Member;
+            $member = $member->where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
+            if(empty(ShortCodes::where(['type'=>5,'code'=>$request->product_code, 'status'=>0])->get()->toArray()))
+            {
+                return response(['msg' => 'Product code not found!'], 401) // 401 Status Code: Forbidden, needs authentication
+                ->header('Content-Type', 'application/json');
+            }
+            $data = [
+                "woh_member" => $request->woh_member,
+                "date_encoded" => Carbon::now(),
+                "product_code" => $request->product_code
+            ];
+            Unilevel::create($data);
+            \DB::table('woh_short_codes')->where(['code' => $request->product_code,'type'=>5])->update(['status'=>1]);
+            return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
+            ->header('Content-Type', 'application/json');
+        }
     }
 }

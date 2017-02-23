@@ -42,5 +42,6 @@ Route::post('/member_login', 'MemberController@post_member_login');
 Route::post('/member_add', 'MemberController@post_member_add');
 Route::post('/member_update', 'MemberController@post_member_update');
 Route::post('/member_withdrawal', 'MemberController@post_member_withdrawal');
+Route::post('/member_unilevel', 'MemberController@post_member_unilevel');
 
 

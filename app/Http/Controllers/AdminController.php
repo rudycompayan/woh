@@ -288,10 +288,10 @@ class AdminController extends Controller
                 'description' => $request->gc_description,
                 'amount' => $request->gc_amount,
                 'bar_code' => $bar_code[$x]['code'],
-                'pin_code' => ($request->code ? $pin_code[0]['code'] : null),
+                'pin_code' => ($request->code && $request->code !=5 ? $pin_code[0]['code'] : null),
                 'entry_code'=>($request->code == 1 ? $entry_code[0]['code'] : null),
                 'cd_code'=>($request->code == 2 ? $cd_code[0]['code'] : null),
-                'product_code'=>($request->code == 5 ? $product_code[0]['code'] : null),
+                'product_code'=>($request->code == 5 ? $product_code[$x]['code'] : null),
                 'status' => $status,
             ];
             GiftCertificate::create($data);

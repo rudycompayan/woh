@@ -102,7 +102,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="member_page/jquery.jOrgChart.js"></script>
     <script>
-        var dialog2, form2, dialog3, form3;
+        var dialog2, form2, dialog3, form3, dialog4, form4;
         jQuery(document).ready(function() {
             $( "#my-account" ).on( "click", function(e) {
                 e.preventDefault();
@@ -120,6 +120,11 @@
                 @else
                     dialog3.dialog("open");
                 @endif
+            });
+
+            $( "#unilevel-link" ).on( "click", function(e) {
+                e.preventDefault();
+                dialog4.dialog("open");
             });
 
             dialog2 = $( "#dialog-form2" ).dialog({
@@ -295,6 +300,87 @@
                 var txtQty = $(this).val().replace(/[^0-9\.]/g,'');
                 $(this).val(txtQty);
             });
+
+            dialog4 = $( "#dialog-form4" ).dialog({
+                autoOpen: false,
+                height: 200,
+                width: 800,
+                modal: true,
+                buttons: {
+                    "Submit": function(){
+
+                        if(!$('#product_code').val())
+                        {
+                            alert('Please enter product code.');
+                            $('#product_code').focus();
+                            return false;
+                        }
+
+                        $('#ajax-loader').fadeIn();
+                        $.ajax({
+
+                            type: "POST",
+
+                            url: form4.prop('action'),
+
+                            data: form4.serialize(),
+
+                            success: function(data, NULL, jqXHR) {
+                                $('#ajax-loader').fadeOut();
+                                if(jqXHR.status === 200 ) {//redirect if  authenticated user.
+                                    alert("Product code successfully save.");
+                                    dialog4.dialog( "close" );
+                                }
+                            },
+                            error: function(data) {
+                                $('#ajax-loader').fadeOut();
+                                if( data.status === 401 ) {//redirect if not authenticated user
+                                    alert("Product code not found!");
+                                }
+                                if( data.status === 422 ) {
+                                    //process validation errors here.
+                                    var err_msg = '';
+                                    var res = JSON.parse(data.responseText);
+                                    for (var key in res) {
+                                        if (res.hasOwnProperty(key)) {
+                                            var obj = res[key];
+                                            for (var prop in obj) {
+                                                if (obj.hasOwnProperty(prop)) {
+                                                    err_msg += '<p>'+obj[prop] + "</p>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $('#first_name').focus();
+                                    $('#form1_error').html(err_msg);
+                                    $('#form1_error').fadeIn();
+                                }
+                            }
+                        });
+                    },
+                    Cancel: function() {
+                        dialog4.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    $('#form1_error').html('');
+                    $('#form1_error').fadeOut();
+                    form4[ 0 ].reset();
+                },
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+
+            form4 = dialog4.find( "form" ).on( "submit", function( event ) {
+                event.preventDefault();
+            });
+
         });
     </script>
 </head>
@@ -310,7 +396,7 @@
                 <li>
                     <a href="{{action('MemberController@member_transactions')}}">Transactions & Ernings</a>
                 </li>
-                <li><a href="">Unilevel Commision</a></li>
+                <li><a href="" id="unilevel-link">Unilevel Commision</a></li>
                 <li><a href="{{action('MemberController@member_logout')}}" onclick="return confirm('Are you sure you want to logout?')">Logout</a></li>
             </ul>
         </div>
@@ -427,7 +513,7 @@
         </tr>
         <tr style="color: #2b542c;background-color: #efefef">
             <td class='rows' colspan="10"  style="color: #2b542c;">Total Gc's ==></td>
-            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals"><b>{{ number_format($gc/500) }} X &#8369; 500 = &#8369; {{ number_format($gc,2) }}</b></span></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals"><b>{{ number_format($gc/500) }} X &#8369; 600 = &#8369; {{ number_format($gc,2) }}</b></span></td>
         </tr>
         <tr style="color: #2b542c;">
             <td class='rows' colspan="10"  style="color: #2b542c;">Total Earnings ==></td>
@@ -491,6 +577,16 @@
         <input type="text" name="amount" id="amount" placeholder="0.00" class="text ui-widget-content ui-corner-all">
         <label for="notes">Notes</label>
         <textarea name="notes" id="notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all" style="width:95%; height: 150px;"></textarea>
+        <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
+    </fieldset>
+    {!! Form::close() !!}
+    <button id="create-user" style="display: none">Create new user</button>
+</div>
+<div id="dialog-form4" title="Unilevel Commision">
+    {!! Form::open(['data-remote','url' => action('MemberController@post_member_unilevel'), 'id' => 'unilevel_form']) !!}
+    <fieldset>
+        <label for="amount" style="font-size:14px;">Enter Product Code</label>
+        <input type="text" name="product_code" id="product_code" placeholder="XXXXXXXXXX" class="text ui-widget-content ui-corner-all">
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
     </fieldset>
     {!! Form::close() !!}
