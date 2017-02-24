@@ -421,6 +421,44 @@ class MemberController extends Controller
                     ];
                 }
             }
+            $level = [];
+            $member_maintenance = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+            $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
+            if(!empty($downlines))
+            {
+                foreach($downlines as $dl)
+                {
+                    $level[1][] = $dl['woh_member'];
+                }
+                $x=1;
+                while(!empty($level[$x]))
+                {
+                    $level[] = $this->unilevel_dp($level[$x], $x);
+                    $x++;
+                }
+            }
+            if(!empty($level))
+            {
+                for($i=1; $i<= count($level); $i++)
+                {
+                    if(!empty($level[$i]))
+                    {
+                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                        $member_tran[] = [
+                            "woh_member_transaction" => "----------",
+                            "woh_member" => null,
+                            "woh_transaction_type" => 8,
+                            "transaction_date" => Carbon::now(),
+                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * .001),
+                            "transaction_referred" => null,
+                            "no_of_pairs" => null,
+                            "status" => 1,
+                            "transaction_type" => "Unilevel Earnings",
+                            "level" => $i
+                        ];
+                    }
+                }
+            }
         }
         return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit'));
     }
@@ -481,6 +519,45 @@ class MemberController extends Controller
                         "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
                         "level" => $x
                     ];
+                }
+
+            }
+            $level = [];
+            $member_maintenance = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+            $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
+            if(!empty($downlines))
+            {
+                foreach($downlines as $dl)
+                {
+                    $level[1][] = $dl['woh_member'];
+                }
+                $x=1;
+                while(!empty($level[$x]))
+                {
+                    $level[] = $this->unilevel_dp($level[$x], $x);
+                    $x++;
+                }
+            }
+            if(!empty($level))
+            {
+                for($i=1; $i<= count($level); $i++)
+                {
+                    if(!empty($level[$i]))
+                    {
+                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                        $member_tran[] = [
+                            "woh_member_transaction" => "----------",
+                            "woh_member" => null,
+                            "woh_transaction_type" => 8,
+                            "transaction_date" => Carbon::now(),
+                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * .001),
+                            "transaction_referred" => null,
+                            "no_of_pairs" => null,
+                            "status" => 1,
+                            "transaction_type" => "Unilevel Earnings",
+                            "level" => $i
+                        ];
+                    }
                 }
             }
         }
@@ -548,4 +625,23 @@ class MemberController extends Controller
             ->header('Content-Type', 'application/json');
         }
     }
+
+    private function unilevel_dp($woh_member, $level)
+    {
+        $downlines_level = [];
+        if(!empty($woh_member))
+        {
+            foreach($woh_member as $wm)
+            {
+                $data = Member::where('sponsor',$wm)->get(['woh_member'])->toArray();
+                if(!empty($data))
+                {
+                    foreach($data as $d)
+                        $downlines_level[] = $d['woh_member'];
+                }
+            }
+        }
+        return $downlines_level;
+    }
+
 }

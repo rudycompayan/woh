@@ -271,6 +271,7 @@
                             $withdrawals = 0;
                             $gc = 0;
                             krsort($member_tran);
+                            $unilevels_total = 0;
                             ?>
                             @foreach($member_tran as $key => $mt)
                                 <?php
@@ -281,6 +282,8 @@
                                     $earn += $mt['tran_amount'];
                                 if($mt['woh_transaction_type'] == 4)
                                     $gc += $mt['tran_amount'];
+                                if($mt['woh_transaction_type'] == 8)
+                                    $unilevels_total += $mt['tran_amount'];
                                 ?>
                                 <tr style="background-color: @if($key%2==0) #efefef @else #ffffff @endif;">
                                     <td class='rows' style="width: 15%; @if($mt['status']==3) text-decoration: line-through; @endif">
@@ -330,6 +333,11 @@
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Earned ==></td>
             <td class='rows'  style="color: #2b542c;"></td>
             <td class='rows' align="right" style="color: #2b542c;"><b>&#8369; {{ number_format(($earn+$gc),2) }}</b></td>
+        </tr>
+        <tr style="color: #2b542c">
+            <td class='rows' colspan="4"  style="color: #2b542c;">Total Unilevel Commision ==></td>
+            <td class='rows'  style="color: #2b542c;"></td>
+            <td class='rows' align="right" style="color: #2b542c;"><b>&#8369; {{ number_format(($unilevels_total),2) }}</b></td>
         </tr>
         <tr style="color: #761c19;background-color: #efefef">
             <td class='rows' colspan="4">Total Withdrawals ==></td>
