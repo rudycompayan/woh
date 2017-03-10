@@ -608,7 +608,7 @@
             <label for="entry_code" class="entry">Choose Account</label>
             <select name="account_type" id="account_type" class="text ui-widget-content ui-corner-all" style="width: 97%">
                 <option value="">Choose Account</option>
-                <option value="entry_code">Regular Account</option>
+                <option value="entry_code">Pay-in Account</option>
                 <option value="cd_code">CD Account</option>
             </select>
             <label for="pin_code">Pin Code</label>

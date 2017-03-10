@@ -65,7 +65,7 @@
                                     <i class="shortcut-icon icon-bookmark"></i>
                                     <span class="shortcut-label">Withdrawals</span>
                                 </a>
-                                <a href="javascript:;" class="shortcut">
+                                <a href="{{action('AdminController@klp_members')}}" class="shortcut">
                                     <i class="shortcut-icon icon-signal"></i>
                                     <span class="shortcut-label">KLP Members</span>
                                 </a>

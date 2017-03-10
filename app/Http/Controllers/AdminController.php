@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\DownlineLevel;
 use App\Models\GiftCertificate;
 use App\Models\Member;
 use App\Models\MemberCredit;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
+use App\Models\Unilevel;
 use Carbon\Carbon;
 use Faker\Provider\Barcode;
 use Illuminate\Http\Request;
@@ -354,6 +356,17 @@ class AdminController extends Controller
         ->header('Content-Type', 'application/json');
     }
 
+    public function klp_members(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        $klp_member = Member::orderBy('woh_member', 'DESC')->get()->toArray();
+        return view('admin_page2.klp_members', compact('member_tran', 'member', 'klp_member'));
+    }
+
     private function generatePin( $number ) {
         // Generate set of alpha characters
         $alpha = array();
@@ -380,5 +393,23 @@ class AdminController extends Controller
         }
 
         return implode('', $rand);
+    }
+
+    private function unilevel_dp($woh_member, $level)
+    {
+        $downlines_level = [];
+        if(!empty($woh_member))
+        {
+            foreach($woh_member as $wm)
+            {
+                $data = Member::where('sponsor',$wm)->get(['woh_member'])->toArray();
+                if(!empty($data))
+                {
+                    foreach($data as $d)
+                        $downlines_level[] = $d['woh_member'];
+                }
+            }
+        }
+        return $downlines_level;
     }
 }

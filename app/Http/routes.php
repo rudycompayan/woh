@@ -25,6 +25,7 @@ Route::get('/withdrawal_request', 'AdminController@withdrawal_request');
 Route::get('/short_codes', 'AdminController@short_codes');
 Route::get('/gift_certificates', 'AdminController@gift_certificates');
 Route::get('/redeem_gc', 'AdminController@redeem_gc');
+Route::get('/klp_members', 'AdminController@klp_members');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
