@@ -327,7 +327,7 @@
         </tr>
         <tr style="color: #2b542c;background-color: #efefef">
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Gc's ==></td>
-            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><b>{{ number_format($gc/500) }} X &#8369; 600 = &#8369; {{ number_format($gc,2) }}</b></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><b>{{ number_format($gc/500) }} X &#8369; 300 = &#8369; {{ number_format($gc,2) }}</b></td>
         </tr>
         <tr style="color: #2b542c">
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Earned ==></td>

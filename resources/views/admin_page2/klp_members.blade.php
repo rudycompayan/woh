@@ -11,12 +11,13 @@
                             <h3>KLP Members</h3>
                         </div>
                         <!-- /widget-header -->
-                        <div class="widget-content"   style="overflow: scroll; height: 500px">
+                        <div class="widget-content"   style="overflow: scroll; max-height: 500px">
                             <table class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
                                     <th>ID #</th>
                                     <th>Member Name</th>
+                                    <th>Username</th>
                                     <th>Registered On</th>
                                     <th>Account Type</th>
                                 </tr>
@@ -27,14 +28,14 @@
                                         <tr>
                                             <td>{!! $mt['woh_member'] !!}</td>
                                             <td>{!! $mt['first_name'] !!} {!! $mt['last_name'] !!}</td>
+                                            <td>{!! $mt['username'] !!}</td>
                                             <td>{!! \Carbon\Carbon::parse($mt['created_at'])->format('m/d/Y H:i A') !!}</td>
                                             <td>{!! isset($mt['cd_code']) ? 'Comission Deduction' : 'Payin' !!}</td>
                                         </tr>
                                     @endforeach
                                 @endif
                                 <tr>
-                                    <td colspan="3"><b>Totals Member ==></b></td>
-                                    <td style="text-align: right"><b>{{ number_format(count($klp_member)) }}</b></td>
+                                    <td colspan="5"><b>Totals Member ==> {{ number_format(count($klp_member)) }}</b></td>
                                 </tr>
                                 </tbody>
                             </table>

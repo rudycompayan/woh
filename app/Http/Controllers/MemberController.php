@@ -293,7 +293,7 @@ class MemberController extends Controller
                     "woh_member" => $request->sponsor,
                     "woh_transaction_type" => 2,
                     "transaction_date" => Carbon::now(),
-                    "tran_amount" => 500,
+                    "tran_amount" => 400,
                     "transaction_referred" => $member->woh_member,
                     'status' => 1,
                     "level" => $request->level
