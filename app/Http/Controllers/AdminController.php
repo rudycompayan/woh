@@ -214,12 +214,12 @@ class AdminController extends Controller
                 if(!empty($member_credit2) && $member_credit2[0]['credit_amount'] == 0)
                 {
                     \DB::table('woh_member_credit')->where('woh_member_credit', $member_credit2[0]['woh_member_credit'])->delete();
-                    \DB::table('woh_member')->where('woh_member', $member[0]['woh_member'])->update(['status'=>1,'picture'=>'online.png']);
+                    \DB::table('woh_member')->where('woh_member', $member[0]['woh_member'])->update(['status'=>1,'picture'=> ($member[0]['gender'] == 'male' ? 'online-m.png' : 'online-f.png')]);
                     $tran_data = [
                         "woh_member" => $member[0]['sponsor'],
                         "woh_transaction_type" => 2,
                         "transaction_date" => Carbon::now(),
-                        "tran_amount" => 200,
+                        "tran_amount" => 400,
                         "transaction_referred" => $member[0]['woh_member'],
                         'status' => 1
                     ];
@@ -233,7 +233,7 @@ class AdminController extends Controller
                             "woh_member" => $member[0]['downline_of'],
                             "woh_transaction_type" => 3,
                             "transaction_date" => Carbon::now(),
-                            "tran_amount" => 200,
+                            "tran_amount" => 100,
                             "transaction_referred" => null,
                             'status' => 1
                         ];

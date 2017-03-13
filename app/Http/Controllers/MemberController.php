@@ -267,23 +267,38 @@ class MemberController extends Controller
         else
             \DB::table('woh_gc')->where(['entry_code' => $request->entry_code])->update(['status'=>1]);
 
-            $data = [
-            "first_name" => $request->first_name,
-            "last_name" => $request->last_name,
-            "middle_name" => $request->middle_name,
-            "address" => $request->address,
-            "bday" => $request->bday,
-            "gender" => $request->gender,
-            "tree_position" => $request->tree_position,
-            "sponsor" => $request->sponsor,
-            "downline_of" => $request->downline_of,
-            "picture" => $request->picture,
-            "username" => $request->username,
-            "password" => $request->password,
-            "status" => $request->account_type == 'entry_code' ? 1 : 0,
-            "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
-            "level" => $request->level
-            ];
+        $picture = '';
+        if($request->account_type == 'entry_code')
+        {
+            if($request->gender == 'male')
+                $picture = 'online-m.png';
+            else
+                $picture = 'online-f.png';
+        }
+        else
+        {
+            if($request->gender == 'male')
+                $picture = 'floating-m.png';
+            else
+                $picture = 'floating-f.png';
+        }
+        $data = [
+        "first_name" => $request->first_name,
+        "last_name" => $request->last_name,
+        "middle_name" => $request->middle_name,
+        "address" => $request->address,
+        "bday" => $request->bday,
+        "gender" => $request->gender,
+        "tree_position" => $request->tree_position,
+        "sponsor" => $request->sponsor,
+        "downline_of" => $request->downline_of,
+        "picture" => $picture,
+        "username" => $request->username,
+        "password" => $request->password,
+        "status" => $request->account_type == 'entry_code' ? 1 : 0,
+        "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
+        "level" => $request->level
+        ];
         $member = Member::create($data);
         if (!empty($member))
         {
