@@ -8,39 +8,65 @@
                 <div class="span12">
                     <div class="widget widget-table action-table">
                         <div class="widget-header"> <i class="icon-th-list"></i>
-                            <h3>KLP Members</h3>
+                            <h3>KLP - {!! $member[0]->woh_member !!} {!! $member[0]->first_name !!} {!! $member[0]->last_name !!} / {!! $member[0]->username !!}</h3>
                         </div>
                         <!-- /widget-header -->
-                        <div class="widget-content"   style="overflow: scroll; max-height: 500px">
+                        <div class="widget-content">
                             <table class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
-                                    <th>ACCT. #</th>
-                                    <th>Member Name</th>
-                                    <th>Username</th>
+                                    <th>Birthday</th>
+                                    <th>Gender</th>
                                     <th>Registered On</th>
-                                    <th>Account Type</th>
+                                    <th>Total Earnings</th>
+                                    <th>Credits</th>
+                                    <th>Payments</th>
+                                    <th>Total Withdrawals</th>
+                                    <th>Current Savings</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @if(isset($klp_member))
-                                    @foreach($klp_member as $key => $mt)
-                                        <tr>
-                                            <td><a href="{{action('AdminController@klp_members_account', ['member'=>$mt['woh_member']])}}">{!! $mt['woh_member'] !!}</a></td>
-                                            <td>{!! $mt['first_name'] !!} {!! $mt['last_name'] !!}</td>
-                                            <td>{!! $mt['username'] !!}</td>
-                                            <td>{!! \Carbon\Carbon::parse($mt['created_at'])->format('m/d/Y H:i A') !!}</td>
-                                            <td>{!! isset($mt['cd_code']) ? 'Comission Deduction' : 'Payin' !!}</td>
-                                        </tr>
+                                @if(isset($member_tran))
+                                    <?php
+                                    $earn = 0;
+                                    $withdrawals = 0;
+                                    $gc = 0;
+                                    krsort($member_tran);
+                                    $unilevels_total = 0;
+                                    $cd_payment = 0;
+                                    ?>
+                                    @foreach($member_tran as $key => $mt)
+                                        <?php
+                                        if($mt['woh_transaction_type'] == 1)
+                                            if($mt['status'] !=3)
+                                                $withdrawals += $mt['tran_amount'];
+                                        if($mt['woh_transaction_type'] != 1 && $mt['woh_transaction_type'] != 4)
+                                            $earn += $mt['tran_amount'];
+                                        if($mt['woh_transaction_type'] == 4)
+                                            $gc += $mt['tran_amount'];
+                                        if($mt['woh_transaction_type'] == 8)
+                                            $unilevels_total += $mt['tran_amount'];
+                                        if(!empty($mt['cd_payment']))
+                                            $cd_payment += $mt['cd_payment'];
+                                        ?>
                                     @endforeach
                                 @endif
-                                <tr>
-                                    <td colspan="5"><b>Totals Member ==> {{ number_format(count($klp_member)) }}</b></td>
-                                </tr>
+                                    <tr>
+                                        <td>{!! \Carbon\Carbon::parse($member[0]->bday)->format('m/d/Y') !!}</td>
+                                        <td>{!! $member[0]['gender'] !!}</td>
+                                        <td>{!! \Carbon\Carbon::parse($member[0]['created_at'])->format('m/d/Y H:i A') !!}</td>
+                                        <td style="text-align: right">&#8369; {!! number_format(($earn+$unilevels_total),2) !!}</td>
+                                        <td style="text-align: right">&#8369; {!! number_format((!empty($member_credit) ? $member_credit[0]['credit_amount'] : 0),2) !!}</td>
+                                        <td style="text-align: right">&#8369; {!! number_format($cd_payment,2) !!}</td>
+                                        <td style="text-align: right">&#8369; {!! number_format($withdrawals,2) !!}</td>
+                                        <td style="text-align: right">&#8369; {!! number_format((($earn+$unilevels_total)-$withdrawals),2) !!}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                         <!-- /widget-content -->
+                        <br />
+                        <h3><a href="{{action('AdminController@klp_members')}}">&laquo; Back to KLP Member List</a></h3>
                     </div>
                     <!-- /widget -->
                 </div>
@@ -51,6 +77,26 @@
         <!-- /container -->
     </div>
     <!-- /main-inner -->
+</div>
+<div id="dialog-form3" title="Withdrawal Approval Form">
+    {!! Form::open(['data-remote','url' => action('AdminController@post_withdrawal_request_update'), 'id' => 'login_form']) !!}
+    <fieldset>
+        <div id="form1_error" class="alert alert-danger" role="alert" style="display: none"></div>
+        <div class="approve-form">
+            <label for="amount">Transaction No.</label>
+            <input type="text" name="transaction_no" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
+            <label for="amount">Check Number.</label>
+            <input type="text" name="check_num" id="amount" placeholder="123456" class="text ui-widget-content ui-corner-all" style="width: 100%">
+            <label for="amount">Date Issued</label>
+            <input type="text" name="issuance_date" id="amount" placeholder="03/01/2017" class="text ui-widget-content ui-corner-all" style="width: 100%">
+        </div>
+        <label for="admin_notes" class="notes">Admin Notes</label>
+        <textarea name="admin_notes" id="admin_notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all notes" style="width:95%; height: 150px;"></textarea>
+        <input type="hidden" name="woh_member_transaction" value="" id="woh_member_transaction_input">
+        <input type="hidden" name="action" value="" id="action_text">
+    </fieldset>
+    {!! Form::close() !!}
+    <button id="create-user" style="display: none">Create new user</button>
 </div>
 <!-- /main -->
 <!-- /extra -->

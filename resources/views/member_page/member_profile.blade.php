@@ -651,8 +651,10 @@
     <button id="create-user" style="display: none">Create new user</button>
 </div>
 <div id="choose_dialog" title="Select Downline" style="text-align: center">
-    @if($member_heads < 7)
+    @if($member_heads < 7 && ($member[0]->first_name != 'Windows' && $member[0]->middle_name != 'Of' && $member[0]->last_name != 'Heaven'))
     <a id="add-account"><img src="member_page/images/plus.png" width="50"></a>
+    @elseif($member_heads < 15 && ($member[0]->first_name == 'Windows' && $member[0]->middle_name == 'Of' && $member[0]->last_name == 'Heaven'))
+        <a id="add-account"><img src="member_page/images/plus.png" width="50"></a>
     @endif
     <a id="new-account"><img src="member_page/images/downline.png" width="50"></a>
 </div>
