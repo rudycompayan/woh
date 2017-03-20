@@ -33,7 +33,7 @@
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
-                                    class="icon-user"></i> Admin <b class="caret"></b></a>
+                                    class="icon-user"></i> {{ ucfirst(Session::get('woh_admin_user')[0]['user_type']) }}<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="javascript:;">Profile</a></li>
                             <li><a href="{!! action('AdminController@admin_logout') !!}" onclick="return confirm('Are you sure you want to logout account?');">Logout</a></li>

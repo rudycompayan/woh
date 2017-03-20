@@ -54,9 +54,9 @@
                                             <label href="#" class="news-item-title" target="_blank"  class="entry">Append</label>
                                              <table cellpadding="5">
                                                  <tr>
-                                                     <td class="checkbox entry"><input type="radio" class="code" name="code" value="1"> Entry Code</td>
-                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="2"> CD Code</td>
-                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="5"> Product Code</td>
+                                                     <td class="checkbox entry"><input type="radio" class="code" name="code" value="1"> Entry Code ({{ !empty($gc_set) ? $gc_set[0]['entry_code'] : 0}})</td>
+                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="2"> CD Code ({{ !empty($gc_set) ?  $gc_set[0]['cd_code'] :0  }})</td>
+                                                     <td class="checkbox entry"><input type="radio" class="code"  name="code" value="5"> Product Code ({{ !empty($gc_set) ?  $gc_set[0]['product_code'] : 0}})</td>
                                                  </tr>
                                                  <tr>
                                                      <td colspan="3"><input type="text" name="gc_number" placeholder="No of GC to produce"></td>

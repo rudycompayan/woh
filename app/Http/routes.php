@@ -27,6 +27,7 @@ Route::get('/gift_certificates', 'AdminController@gift_certificates');
 Route::get('/redeem_gc', 'AdminController@redeem_gc');
 Route::get('/klp_members', 'AdminController@klp_members');
 Route::get('/klp_members_account', 'AdminController@klp_members_account');
+Route::get('/gc_set', 'AdminController@gc_set');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
@@ -34,6 +35,7 @@ Route::post('/withdrawal_request_update', 'AdminController@post_withdrawal_reque
 Route::post('/gift_certificates', 'AdminController@post_gift_certificates');
 Route::post('/redeem_gc', 'AdminController@post_redeem_gc');
 Route::post('/print_gc', 'AdminController@post_print_gc');
+Route::post('/gc_set', 'AdminController@post_gc_set');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');
