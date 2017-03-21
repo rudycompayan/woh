@@ -512,7 +512,7 @@ class AdminController extends Controller
                                 "transaction_referred" => null,
                                 "no_of_pairs" => null,
                                 "status" => 1,
-                                "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
+                                "transaction_type" => ($x%5==0) ? "GC worth 300 pesos" : "Level Pair",
                                 "level" => $x
                             ];
                         }
@@ -561,10 +561,26 @@ class AdminController extends Controller
         }
     }
 
-    public function gc_set()
+    public function gc_set(Request $request)
     {
-        $gc_set = GCSet::get()->toArray();
-        return view('admin_page2.gc_set', compact('gc_set'));
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if ($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif ($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $gc_set = GCSet::get()->toArray();
+                return view('admin_page2.gc_set', compact('gc_set'));
+            }
+        }
     }
 
     public function post_gc_set(Request $request)
@@ -577,6 +593,27 @@ class AdminController extends Controller
         if($request->product_code)
             \DB::table('woh_gc_set')->update(['product_code'=>((!empty($gc_set) ? $gc_set[0]['product_code']: 0) + $request->max_number)]);
         return redirect(action('AdminController@gc_set'));
+    }
+
+    public function change_password(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            $user = Admin::where('woh_admin', $admin[0]['woh_admin'])->get()->toArray();
+            return view('admin_page2.change_password', compact('user'));
+        }
+    }
+
+    public function post_change_password(Request $request)
+    {
+        \DB::table('woh_admin')->where('woh_admin',$request->woh_admin)->update(['password'=>$request->password]);
+        return redirect(action('AdminController@change_password'));
     }
 
     private function generatePin( $number ) {

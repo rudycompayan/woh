@@ -36,6 +36,7 @@
                                     class="icon-user"></i> {{ ucfirst(Session::get('woh_admin_user')[0]['user_type']) }}<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="javascript:;">Profile</a></li>
+                            <li><a href="{!! action('AdminController@change_password') !!}">Change Password</a></li>
                             <li><a href="{!! action('AdminController@admin_logout') !!}" onclick="return confirm('Are you sure you want to logout account?');">Logout</a></li>
                         </ul>
                     </li>

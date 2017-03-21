@@ -32,6 +32,14 @@ class MemberController extends Controller
         return view('member_page.member_profile', compact('member', 'downlines', 'member_heads'));
     }
 
+    public function post_member_search(Request $request)
+    {
+        $member = new Member;
+        $member = $member->where('woh_member',$request->woh_member)->get();
+        return response(['msg' => 'Login Successfull', 'woh_member'=>$member], 200) // 200 Status Code: Standard response for successful HTTP request
+        ->header('Content-Type', 'application/json');
+    }
+
     public function downline($upline)
     {
         $downline_li = '';
@@ -283,21 +291,21 @@ class MemberController extends Controller
                 $picture = 'floating-f.png';
         }
         $data = [
-        "first_name" => $request->first_name,
-        "last_name" => $request->last_name,
-        "middle_name" => $request->middle_name,
-        "address" => $request->address,
-        "bday" => $request->bday,
-        "gender" => $request->gender,
-        "tree_position" => $request->tree_position,
-        "sponsor" => $request->sponsor,
-        "downline_of" => $request->downline_of,
-        "picture" => $picture,
-        "username" => $request->username,
-        "password" => $request->password,
-        "status" => $request->account_type == 'entry_code' ? 1 : 0,
-        "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
-        "level" => $request->level
+            "first_name" => ucfirst(strtolower($request->first_name)),
+            "last_name" => ucfirst(strtolower($request->last_name)),
+            "middle_name" => ucfirst(strtolower($request->middle_name)),
+            "address" => $request->address,
+            "bday" => $request->bday,
+            "gender" => $request->gender,
+            "tree_position" => $request->tree_position,
+            "sponsor" => $request->sponsor,
+            "downline_of" => $request->downline_of,
+            "picture" => $picture,
+            "username" => $request->username,
+            "password" => $request->password,
+            "status" => $request->account_type == 'entry_code' ? 1 : 0,
+            "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
+            "level" => $request->level
         ];
         $member = Member::create($data);
         if (!empty($member))
@@ -359,23 +367,20 @@ class MemberController extends Controller
             "gender" => 'required',
         ]);// Returns response with validation errors if any, and 422 Status Code (Unprocessable Entity)
 
+        $member = Member::where('woh_member', $request->woh_member)->get()->toArray();
+
         $data = [
-            "first_name" => $request->first_name,
-            "last_name" => $request->last_name,
-            "middle_name" => $request->middle_name,
+            "first_name" => ucfirst(strtolower($request->first_name)),
+            "last_name" => ucfirst(strtolower($request->last_name)),
+            "middle_name" => ucfirst(strtolower($request->middle_name)),
             "address" => $request->address,
             "bday" => $request->bday,
             "gender" => $request->gender,
+            "password" => $request->password ? $request->password : $member[0]['password']
         ];
-        if (\DB::table('woh_member')->where('woh_member', $request->woh_member)->update($data))
-        {
-            return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
-            ->header('Content-Type', 'application/json');
-        }
-
-        return response(['msg' => 'Member not found!'], 401) // 401 Status Code: Forbidden, needs authentication
+        \DB::table('woh_member')->where('woh_member', $request->woh_member)->update($data);
+        return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
         ->header('Content-Type', 'application/json');
-
     }
 
     public function member_transactions(Request $request)
@@ -431,7 +436,7 @@ class MemberController extends Controller
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 300 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }
@@ -531,7 +536,7 @@ class MemberController extends Controller
                         "transaction_referred" => null,
                         "no_of_pairs" => null,
                         "status" => 1,
-                        "transaction_type" => ($x%5==0) ? "GC worth 600 pesos" : "Level Pair",
+                        "transaction_type" => ($x%5==0) ? "GC worth 300 pesos" : "Level Pair",
                         "level" => $x
                     ];
                 }

@@ -32,7 +32,7 @@
                                                      <td class="checkbox entry"><input type="checkbox" class="code"  name="product_code" value="1"> Product Code ({{ !empty($gc_set) ?  $gc_set[0]['product_code'] : 0}})</td>
                                                  </tr>
                                                  <tr>
-                                                     <td colspan="3"><input type="text" name="max_number" placeholder="No of GC to produce"></td>
+                                                     <td colspan="3"><input type="text" name="max_number" placeholder="No of member to produce"></td>
                                                  </tr>
                                              </table>
                                         </div>

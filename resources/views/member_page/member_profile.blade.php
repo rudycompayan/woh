@@ -276,9 +276,6 @@
                             },
                             error: function(data) {
                                 $('#ajax-loader').fadeOut();
-                                if( data.status === 401 ) {//redirect if not authenticated user
-                                    alert("Member not found!");
-                                }
                                 if( data.status === 422 ) {
                                     //process validation errors here.
                                     var err_msg = '';
@@ -513,7 +510,7 @@
         $('#password').blur(function(){
             if($(this).val() && $(this).val().length < 6)
             {
-                $('#form1_error').html('<p>Password must be from 6 to 8 characters.</p>');
+                $('#form1_error').html('<p>Password must be atleast 6 characters.</p>');
                 $('#form1_error').fadeIn();
             }
             else if($('#re-password').val() && $(this).val() != $('#re-password').val())
@@ -531,7 +528,7 @@
         $('#username').blur(function(){
             if($(this).val() && $(this).val().length < 6)
             {
-                $('#form1_error').html('<p>Username must be from 6 to 8 characters.</p>');
+                $('#form1_error').html('<p>Username must be atleast 6 characters.</p>');
                 $('#form1_error').fadeIn();
             }
             else
@@ -539,6 +536,53 @@
                 $('#form1_error').html('');
                 $('#form1_error').fadeOut();
             }
+        });
+
+        $('#upassword').blur(function(){
+            if($('#ure-password').val() && $(this).val() != $('#ure-password').val())
+            {
+                $('#form2_error').html('<p>Password does not match.</p>');
+                $('#form2_error').fadeIn();
+            }
+            else
+            {
+                $('#form2_error').html('');
+                $('#form2_error').fadeOut();
+            }
+        });
+
+        $('#ure-password').blur(function()
+        {
+            if($(this).val() != $('#upassword').val())
+            {
+                $('#form2_error').html('<p>Password does not match.</p>');
+                $('#form2_error').fadeIn();
+            }
+            else {
+                $('#form2_error').html('');
+                $('#form2_error').fadeOut();
+            }
+        });
+
+        $('#sponsor').blur(function(){
+            $.ajax({
+                type: "POST",
+                url: '{{ action('MemberController@post_member_search') }}',
+                data: {'woh_member':$(this).val()},
+                success: function(data, NULL, jqXHR) {
+                    if(typeof data.woh_member[0] !== 'undefined' && data.woh_member[0] !== null)
+                        $('#sponsor-display').text(data.woh_member[0].woh_member + ' - ' + data.woh_member[0].username)
+                    else
+                    {
+                        alert("Sponsor not found!");
+                        $('#sponsor-display').text('---');
+                    }
+                },
+                error: function(data) {
+                    alert("Sponsor not found!");
+                    $('#sponsor-display').text('');
+                }
+            });
         });
 
         $('#re-password').focus(function(){
@@ -592,18 +636,24 @@
             <label for="downline_of">Downline</label>
             <select name="downline_of" id="downline_of" class="text ui-widget-content ui-corner-all" style="width: 97%">
             </select>
-            <label for="sponsor">Sponsor</label>
-            <input type="text" id="sponsor" value="{!! $member[0]->woh_member !!} - {!! $member[0]->username !!}" placeholder="Rudy Compayan" readonly class="text ui-widget-content ui-corner-all">
-            <input type="hidden" name="sponsor" id="sponsor" placeholder="Rudy Compayan" value="{!! $member[0]->woh_member !!}" readonly class="text ui-widget-content ui-corner-all">
+            <label for="sponsor" style="width: 50px; margin-top: 10px">Sponsor</label>
+            <table cellpadding="10" cellspacing="10">
+                <tr>
+                    <td><input type="text" id="sponsor" value="{!! $member[0]->woh_member !!}" name="sponsor" class="text ui-widget-content ui-corner-all"></td>
+                    <td valign="center" style="color:green; padding-bottom: 12px;">
+                        <img src="member_page/images/check.png" height="20px"> <i id="sponsor-display">{!! $member[0]->woh_member !!} - {!! $member[0]->username !!}</i>
+                    </td>
+                </tr>
+            </table>
             <input type="hidden" name="picture" id="picture" placeholder="picture" value="online.png" class="text ui-widget-content ui-corner-all">
             <!--<label for="email">Email</label>
                 <input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">-->
             <label for="username" id="lusername">Username</label>
-            <input type="username" maxlength="8" name="username" id="username" placeholder="username123" class="text ui-widget-content ui-corner-all">
+            <input type="username" name="username" id="username" placeholder="username123" class="text ui-widget-content ui-corner-all">
             <label for="password" id="lpassword">Password</label>
-            <input type="password" maxlength="8" name="password" id="password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
+            <input type="password" name="password" id="password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <label for="re-password" id="lre-password">Re-type Password</label>
-            <input type="password" maxlength="8" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
+            <input type="password" name="re-password" id="re-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
             <hr>
             <label for="entry_code" class="entry">Choose Account</label>
             <select name="account_type" id="account_type" class="text ui-widget-content ui-corner-all" style="width: 97%">
@@ -629,13 +679,13 @@
 <div id="dialog-form2" title="Account Details">
     {!! Form::open(['data-remote','url' => action('MemberController@post_member_update'), 'id' => 'login_form']) !!}
     <fieldset>
-        <div id="form1_error" class="alert alert-danger" role="alert" style="display: none"></div>
+        <div id="form2_error" class="alert alert-danger" role="alert" style="display: none"></div>
         <label for="first_name" id="lfname">First Name</label>
-        <input type="text" name="first_name" id="first_name" placeholder="Jane" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->first_name !!}">
+        <input type="text" name="first_name" readonly id="first_name" placeholder="Jane" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->first_name !!}">
         <label for="middle_name" id="lmname">Middle Name</label>
-        <input type="text" name="middle_name" id="middle_name" placeholder="Suarez" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->middle_name !!}">
+        <input type="text" name="middle_name" readonly id="middle_name" placeholder="Suarez" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->middle_name !!}">
         <label for="last_name" id="llname">Last Name</label>
-        <input type="text" name="last_name" id="last_name" placeholder="Cruz" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->last_name !!}">
+        <input type="text" name="last_name" readonly id="last_name" placeholder="Cruz" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->last_name !!}">
         <label for="address" id="laddress">Address</label>
         <input type="text" name="address" id="address" placeholder="Mc Briones St. Tipolo, Mandaue City Cebu" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->address !!}">
         <label for="gender" id="lgender">Gender</label>
@@ -645,6 +695,11 @@
         </select>
         <label for="bday" id="lbday">Birthday</label>
         <input type="text" name="bday" id="bday" placeholder="1990-01-25" class="text ui-widget-content ui-corner-all" value="{!! $member[0]->bday !!}">
+        <label for="password" id="password" style="width: 100%">Current Password: <b>{!! $member[0]->password!!}</b></label>
+        <label for="password" id="password"  style="width: 100%">New Password (<b  style="color: red;">Change your password? Just type your new password below.</b>)</label>
+        <input type="password" name="password" id="upassword" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
+        <label for="re-password" id="re-password"  style="width: 100%">Re-type Password (<b style="color: red;">Change your password? Just re-type your new password below.</b>)</label>
+        <input type="password" name="re-password" id="ure-password" placeholder="xxxxxxx" class="text ui-widget-content ui-corner-all">
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
     </fieldset>
     {!! Form::close() !!}
