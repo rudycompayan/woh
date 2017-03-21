@@ -9,9 +9,9 @@
 
         <div class="container">
 
-            <p class="title wow fadeIn">Welcome</p>
+            <p class="title wow fadeIn">Welcome. <a href="http://shopping.wohhypermart.com" style="color: #0b791d; text-decoration: underline">Shop</a> and <font style="text-transform: uppercase; color: #0b791d">Earn pa more</font>!! </p>
 
-            <p class="description wow fadeIn">Secivres dna stcudorp hguorhtkaerb ruo urht tekram eht fo htlaew eht gnizimixam yb ytilibats cimonoce dna ecnednepedni laicnanif eveihca ot srotubirtsid ruo gnirewopme yb ytirepsorp dna ytinutroppo fo srood eht nepo ot dna stekram labolg dna lanoiger ,lacol ot secivres dna stcudorp gnidnatstuo fo noitubirtsid ytilauq dna noitavonni dehctamnu edivorp ew.</p>
+            <p class="description wow fadeIn"><font style="font-size:26px; color: #1c9e99">CHANGE is NOW ... your basic Grocery need spendings  Now to receive</font>  <font style="font-size:26px; color:#ab171e">big, big INCOME.</font></p>
 
             <div class="row">
 
@@ -19,9 +19,9 @@
 
                     <div class="box maxheight">
 
-                        <strong>Our Mission</strong>
+                        <strong>OUR VISION</strong>
 
-                        <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                        <p>PEOPLE's Financial-Spiritual-Physical-Social status are prospered. Having their own House, Car, Business, Bank Savings and etc.</p>
 
                         <a href="#" class="btn-default btn1" data-text="Read More">Read More</a>
 
@@ -33,9 +33,9 @@
 
                     <div class="box maxheight">
 
-                        <strong>Our Goals</strong>
+                        <strong>OUR MISSION</strong>
 
-                        <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                        <p>Being in Grocery(basic needs) business, We continually develop programs that would yield top most returns to our Kabanays and customers. GLORY TO GOD!</p>
 
                         <a href="#" class="btn-default btn1" data-text="Read More">Read More</a>
 
@@ -47,9 +47,9 @@
 
                     <div class="box maxheight">
 
-                        <strong>Philosophy of Day</strong>
+                        <strong>MULTI-HAVEN</strong>
 
-                        <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non facilisis sit amet sit amet sit amet turpis sollicitudin.</p>
+                        <p>SNACK BAR Corner, 24HRS. CONVENIENCE, INTERNET HUB, ENTERTAINMENTS, PICK-UP/DINE-IN FOOD, HALO-HALO, BBQ, LANCIAO</p>
 
                         <a href="#" class="btn-default btn1" data-text="Read More">Read More</a>
 
@@ -61,9 +61,9 @@
 
                     <div class="box maxheight">
 
-                        <strong>Things to Do</strong>
+                        <strong>ESPECIALLY FOR YOU</strong>
 
-                        <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                        <p>FLASH Delivery, TEXT Ordering, TELEPHONE Ordering, ONLINE Purchasing, ONSITE BOOKING, KLP "Livelihood".</p>
 
                         <a href="#" class="btn-default btn1" data-text="Read More">Read More</a>
 
@@ -83,7 +83,7 @@
 
             <div class="box">
 
-                <h2>Our Management Team</h2>
+                <h2>Our Customer Relation Executive</h2>
 
                 <div class="row">
 
@@ -97,9 +97,9 @@
 
                                 <div class="caption">
 
-                                    <span>CEO/Owner</span>
+                                    <span>Marketing Consultant</span>
 
-                                    <a href="#">Juan dela Cruz</a>
+                                    <a href="#">Henry Mariscal</a>
 
                                 </div>
 
@@ -119,9 +119,9 @@
 
                                 <div class="caption">
 
-                                    <span>Sales Executive</span>
+                                    <span>Marketing Manager - Dept Head</span>
 
-                                    <a href="#">Maria Clara</a>
+                                    <a href="#">Flora Mae Bustamante</a>
 
                                 </div>
 
@@ -141,9 +141,9 @@
 
                                 <div class="caption">
 
-                                    <span>Marketing Head</span>
+                                    <span>Customer Service Executive </span>
 
-                                    <a href="#">Liza Soberano</a>
+                                    <a href="#">Angelie Sulatan</a>
 
                                 </div>
 
@@ -163,9 +163,9 @@
 
                                 <div class="caption">
 
-                                    <span>Finance Head</span>
+                                    <span>KLP - Program Specialist</span>
 
-                                    <a href="#">Marimar Gwapa</a>
+                                    <a href="#">Noli Gako Jr.</a>
 
                                 </div>
 
@@ -189,9 +189,10 @@
 
             <div class="box">
 
-                <p class="title">Our team is 100% passionate and dynamic team,</p>
+                <p class="title">The team share the same goal towards your living a better life.
+                    </p>
 
-                <p>which is supported in its professional growth and with ongoing professional development opportunities.</p>
+                <p class="title">Your success is our success.</p>
 
             </div>
 
@@ -205,7 +206,7 @@
 
             <div class="box">
 
-                <h2>What Makes Us Special?</h2>
+                <!--h2>What Makes Us Special?</h2-->
 
                 <div class="row">
 
@@ -215,9 +216,10 @@
 
                         <div class="extra-wrap">
 
-                            <strong>Mauris accumsan nulla vel diam</strong>
+                            <strong>Net Cafe, Snack Bar and Video show</strong>
 
-                            <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                            <p>After sitting for an hour or so doing research, document encode and social media update. Try our very own household halo halo and savor it's uniqueness.
+                            </p>
 
                         </div>
 
@@ -229,9 +231,10 @@
 
                         <div class="extra-wrap">
 
-                            <strong>Fusce euismod consequat ante</strong>
+                            <strong>24hrs  Convenience  Area</strong>
 
-                            <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                            <p>Need not to worry of the items you have forgotten to include on your grocery list. Our ground floor section is open 24hours a day. You can come back on your next convenient time.
+                            </p>
 
                         </div>
 
@@ -243,10 +246,10 @@
 
                         <div class="extra-wrap">
 
-                            <strong>Sed in lacus ut enim adipiscing aliquet</strong>
+                            <strong>Outdoor Food Corner, Videoke, Band show..</strong>
 
-                            <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
-
+                            <p>A place to dine with a selection of local specialty foods such as lanciao, kalderetang kanding, larang etc.. We also have a couple of to be grilled items to choose from. There is no better way than to share your food moments with your friends, so bring them along.
+                            </p>
                         </div>
 
                     </div>
@@ -257,9 +260,10 @@
 
                         <div class="extra-wrap">
 
-                            <strong>Vestibulum iaculis lacinia est</strong>
+                            <strong> Kabanay  Livelihood  Program (KLP) Earnings</strong>
 
-                            <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit. Integer sit amet erat non turpis interdum facilisis sit amet sit amet turpis sollicitudin.</p>
+                            <p>A membership program extended to KLP bonafide members in order to earn regular monthly incentives of thousand pesos, insurance package, discounts to future merchant partners and promos.
+                            </p>
 
                         </div>
 
@@ -277,31 +281,39 @@
 
         <div class="container">
 
-            <h2>Latest Photos</h2>
+            {{--<h2>Latest Photos</h2>--}}
 
             <div class="row">
 
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
 
-                    <figure class="wow zoomIn" data-wow-delay="0.1s"><a href="main_page/img/img1.jpg"><i></i><img src="main_page/img/page1_pic5.jpg" alt=""></a></figure>
+                    <figure class="wow zoomIn" data-wow-delay="0.1s"><a href="main_page/img/img1.jpg"><i></i><img src="main_page/img/page1_pic5.jpg" alt=""></a>
+                        <br /> <p style="color: #000; text-align: center; width: 100%">Full Grocery Area Basement</p>
+                    </figure>
 
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
 
-                    <figure class="wow zoomIn"><a href="main_page/img/img2.jpg"><i></i><img src="main_page/img/page1_pic6.jpg" alt=""></a></figure>
+                    <figure class="wow zoomIn"><a href="main_page/img/img2.jpg"><i></i><img src="main_page/img/page1_pic6.jpg" alt=""></a>
+                        <br /> <p style="color: #000; text-align: center; width: 100%">24hrs Convenience Area - Ground Floor</p>
+                    </figure>
 
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
 
-                    <figure class="wow zoomIn"><a href="main_page/img/img3.jpg"><i></i><img src="main_page/img/page1_pic7.jpg" alt=""></a></figure>
+                    <figure class="wow zoomIn"><a href="main_page/img/img3.jpg"><i></i><img src="main_page/img/page1_pic7.jpg" alt=""></a>
+                        <br /> <p style="color: #000; text-align: center; width: 100%">Internet Cafe and Snack Bar</p>
+                    </figure>
 
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
 
-                    <figure class="wow zoomIn" data-wow-delay="0.1s"><a href="main_page/img/img4.jpg"><i></i><img src="main_page/img/page1_pic8.jpg" alt=""></a></figure>
+                    <figure class="wow zoomIn" data-wow-delay="0.1s"><a href="main_page/img/img4.jpg"><i></i><img src="main_page/img/page1_pic8.jpg" alt=""></a>
+                        <br /> <p style="color: #000; text-align: center; width: 100%">Outdoor Food Corner - Vicinity Open Parking</p>
+                    </figure>
 
                 </div>
 

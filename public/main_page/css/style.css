@@ -447,10 +447,10 @@ transition:all .25s
 	box-shadow:0 0 2px 0 rgba(0, 0, 0, .16)
 }
 .thumb-box5 figure {
-	border-radius:100%;
+	/*border-radius:100%;*/
 	width:120px;
 	height:120px;
-	background:#abf0d1;
+	/*background:#abf0d1;*/
 	text-align:center;
 	line-height:116px;
 	-webkit-box-shadow:0 0 5px 0 rgba(0, 0, 0, .2);
