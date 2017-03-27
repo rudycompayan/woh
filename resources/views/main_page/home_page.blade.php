@@ -159,7 +159,7 @@
 
                             <div class="thumbnail">
 
-                                <figure><img src="main_page/img/page1_pic4.jpg" alt=""></figure>
+                                <figure><img src="main_page/img/page1_pic3.jpg" alt=""></figure>
 
                                 <div class="caption">
 

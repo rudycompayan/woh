@@ -23,6 +23,8 @@ class Member extends Model
         "password",
         "status",
         "cd_code",
+        "entry_code",
+        "pin_code",
         "level"
     ];
 }

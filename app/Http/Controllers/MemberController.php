@@ -305,6 +305,8 @@ class MemberController extends Controller
             "password" => $request->password,
             "status" => $request->account_type == 'entry_code' ? 1 : 0,
             "cd_code" => $request->account_type == 'cd_code' ? $request->cd_code : null,
+            "entry_code" => $request->account_type == 'entry_code' ? $request->entry_code : null,
+            "pin_code" => $request->pin_code,
             "level" => $request->level
         ];
         $member = Member::create($data);
