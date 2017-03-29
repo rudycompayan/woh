@@ -248,7 +248,7 @@
 
                             <strong>Outdoor Food Corner, Videoke, Band show..</strong>
 
-                            <p>A place to dine with a selection of local specialty foods such as lanciao, kalderetang kanding, larang etc.. We also have a couple of to be grilled items to choose from. There is no better way than to share your food moments with your friends, so bring them along.
+                            <p>A place to dine with a selection of local specialty foods such as lanciao, kalderetang kanding, larang etc.. We also have a couple of to be grilled items to choose from. There is no better way to share your food moments than with family and friends.
                             </p>
                         </div>
 
