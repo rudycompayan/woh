@@ -29,6 +29,13 @@ Route::get('/klp_members', 'AdminController@klp_members');
 Route::get('/klp_members_account', 'AdminController@klp_members_account');
 Route::get('/gc_set', 'AdminController@gc_set');
 Route::get('/change_password', 'AdminController@change_password');
+Route::get('/admin_reports', 'AdminController@admin_reports');
+Route::get('/admin_reports_release_codes', 'AdminController@release_codes');
+Route::get('/admin_reports_unused_codes', 'AdminController@unused_codes');
+Route::get('/admin_reports_cd_accounts', 'AdminController@cd_accounts');
+Route::get('/admin_reports_klp_member_list', 'AdminController@klp_member_list');
+Route::get('/admin_reports_redeemed_gc', 'AdminController@report_redeemed_gc');
+Route::get('/admin_reports_withdrawals', 'AdminController@report_withdrawals');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');

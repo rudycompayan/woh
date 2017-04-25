@@ -16,6 +16,7 @@ use Faker\Provider\Barcode;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS1DFacade;
@@ -614,6 +615,153 @@ class AdminController extends Controller
     {
         \DB::table('woh_admin')->where('woh_admin',$request->woh_admin)->update(['password'=>$request->password]);
         return redirect(action('AdminController@change_password'));
+    }
+
+    public function admin_reports(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        $admin = $request->session()->get('woh_admin_user');
+        if($admin[0]['user_type'] == 'cashier')
+            return redirect(action('AdminController@redeem_gc'));
+        elseif($admin[0]['user_type'] == 'controller')
+            return redirect(action('AdminController@gc_set'));
+        elseif($admin[0]['user_type'] == 'accounting')
+            return redirect(action('AdminController@gift_certificates'));
+        else
+            return view('admin_page2.reports', compact('admin'));
+    }
+
+    public function klp_member_list(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $klp_member = Member::orderBy('woh_member', 'ASC')->get()->toArray();
+                return view('admin_page2.klp_member_list', compact('member_tran', 'member', 'klp_member'));
+            }
+        }
+    }
+
+    public function release_codes(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $klp_member = Member::orderBy('woh_member', 'ASC')->get()->toArray();
+                return view('admin_page2.release_codes', compact('member_tran', 'member', 'klp_member'));
+            }
+        }
+    }
+
+    public function unused_codes(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $entry_codes = Member::whereNotNull('entry_code')->pluck('entry_code')->toArray();
+                $cd_codes = Member::whereNotNull('cd_code')->pluck('cd_code')->toArray();
+                $unused_codes = GiftCertificate::where(function($query) use($entry_codes, $cd_codes){
+                    $query->whereNotIn('cd_code', $cd_codes)->orWhereNotIn('entry_code', $entry_codes);
+                })->whereNotNull('pin_code')->get()->toArray();
+                return view('admin_page2.unused_codes', compact('unused_codes'));
+            }
+        }
+    }
+
+    public function cd_accounts(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $klp_member = Member::join('woh_member_credit','woh_member_credit.woh_member', '=','woh_member.woh_member')->orderBy('woh_member.woh_member', 'ASC')->get()->toArray();
+                return view('admin_page2.cd_accounts', compact('member_tran', 'member', 'klp_member'));
+            }
+        }
+    }
+
+    public function report_withdrawals(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $member_trans = new MemberTransaction;
+                $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_transaction.woh_member')
+                    ->where(['woh_member_transaction.woh_transaction_type'=>1, 'woh_member_transaction.status'=>1])->orderBy('woh_member_transaction','desc')->get([
+                        'first_name','last_name', 'change', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
+                    ])->toArray();
+                return view('admin_page2.report_withdrawals', compact('member_tran'));
+            }
+        }
     }
 
     private function generatePin( $number ) {

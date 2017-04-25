@@ -83,7 +83,7 @@
 
             <div class="box">
 
-                <h2>Our Customer Relation Executive</h2>
+                <h2>Our Corporate Social Responsibility, Livelihood Projects & Program</h2>
 
                 <div class="row">
 
@@ -93,14 +93,12 @@
 
                             <div class="thumbnail">
 
-                                <figure><img src="main_page/img/page1_pic3.jpg" alt=""></figure>
+                                <figure><img src="main_page/img/page1_pic1.jpg" alt=""></figure>
 
                                 <div class="caption">
 
-                                    <span>Marketing Consultant</span>
-
-                                    <a href="#">Henry Mariscal</a>
-
+                                    <span>Corporate Social Poverty <br> People Empowerment Projects<br> Executive Director</span>
+                                    <a href="#">Hanzel L. Armenion</a>
                                 </div>
 
                             </div>
@@ -119,7 +117,7 @@
 
                                 <div class="caption">
 
-                                    <span>Marketing Manager - Dept Head</span>
+                                    <span>Marketing-Research <br>and<br>Department Manager </span>
 
                                     <a href="#">Flora Mae Bustamante</a>
 
@@ -137,13 +135,13 @@
 
                             <div class="thumbnail">
 
-                                <figure><img src="main_page/img/page1_pic1.jpg" alt=""></figure>
+                                <figure><img src="main_page/img/page1_pic3.jpg" alt=""></figure>
 
                                 <div class="caption">
 
-                                    <span>Customer Service Executive </span>
+                                    <span>KLP-Livelihookd Network Program Specialist <br>Executive - IT Consultant </span>
 
-                                    <a href="#">Angelie Sulatan</a>
+                                    <a href="#">Mary Grace M. Gellangao</a>
 
                                 </div>
 
@@ -159,13 +157,13 @@
 
                             <div class="thumbnail">
 
-                                <figure><img src="main_page/img/page1_pic3.jpg" alt=""></figure>
+                                <figure><img src="main_page/img/page1_pic4.jpg" alt=""></figure>
 
                                 <div class="caption">
 
-                                    <span>KLP - Program Specialist</span>
+                                    <span>Multi-sectoral partnership <br> for Sustainable <br> Livelihood and Economic Growth</span>
 
-                                    <a href="#">Noli Gako Jr.</a>
+                                    <a href="#"> Lito O. Supapo</a>
 
                                 </div>
 
