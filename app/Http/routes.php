@@ -45,6 +45,10 @@ Route::post('/redeem_gc', 'AdminController@post_redeem_gc');
 Route::post('/print_gc', 'AdminController@post_print_gc');
 Route::post('/gc_set', 'AdminController@post_gc_set');
 Route::post('/change_password', 'AdminController@post_change_password');
+Route::post('/admin_reports_cd_accounts_filter', 'AdminController@post_filter_cd_accounts');
+Route::post('/admin_reports_withdrawals_filter', 'AdminController@post_filter_report_withdrawals');
+Route::post('/admin_reports_release_codes_filter', 'AdminController@post_filter_release_codes');
+Route::post('/admin_reports_unused_codes_filter', 'AdminController@post_filter_unused_codes');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

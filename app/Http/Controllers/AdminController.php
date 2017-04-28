@@ -374,7 +374,7 @@ class AdminController extends Controller
         if($request->code == 2)
             \DB::table('woh_gc_set')->update(['cd_code'=>((!empty($gc_set) ? $gc_set[0]['cd_code'] : 0) - 1)]);
         if($request->code == 5)
-            \DB::table('woh_gc_set')->update(['product_code'=>((!empty($gc_set) ? $gc_set[0]['product_code']: 0) - 1)]);
+            \DB::table('woh_gc_set')->update(['product_code'=>((!empty($gc_set) ? $gc_set[0]['product_code']: 0) - $request->gc_number)]);
         $redirect = action('AdminController@gift_certificates');
         return redirect($redirect);
     }
@@ -677,8 +677,37 @@ class AdminController extends Controller
                 return redirect(action('AdminController@gift_certificates'));
             else
             {
+                $start_date = $end_date = "";
                 $klp_member = Member::orderBy('woh_member', 'ASC')->get()->toArray();
-                return view('admin_page2.release_codes', compact('member_tran', 'member', 'klp_member'));
+                return view('admin_page2.release_codes', compact('start_date', 'end_date', 'klp_member'));
+            }
+        }
+    }
+
+    public function post_filter_release_codes(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $start_date = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : '';
+                $end_date = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : '';
+                $klp_member = Member::orderBy('woh_member', 'ASC')
+                    ->where('created_at', '>=', $start_date)->where('created_at', '<=', $end_date)
+                    ->get()->toArray();
+                return view('admin_page2.release_codes', compact('start_date', 'end_date', 'klp_member'));
             }
         }
     }
@@ -701,12 +730,45 @@ class AdminController extends Controller
                 return redirect(action('AdminController@gift_certificates'));
             else
             {
+                $start_date = $end_date = "";
                 $entry_codes = Member::whereNotNull('entry_code')->pluck('entry_code')->toArray();
                 $cd_codes = Member::whereNotNull('cd_code')->pluck('cd_code')->toArray();
                 $unused_codes = GiftCertificate::where(function($query) use($entry_codes, $cd_codes){
                     $query->whereNotIn('cd_code', $cd_codes)->orWhereNotIn('entry_code', $entry_codes);
                 })->whereNotNull('pin_code')->get()->toArray();
-                return view('admin_page2.unused_codes', compact('unused_codes'));
+                return view('admin_page2.unused_codes', compact('start_date', 'end_date','unused_codes'));
+            }
+        }
+    }
+
+    public function post_filter_unused_codes(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $start_date = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : '';
+                $end_date = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : '';
+                $entry_codes = Member::whereNotNull('entry_code')->pluck('entry_code')->toArray();
+                $cd_codes = Member::whereNotNull('cd_code')->pluck('cd_code')->toArray();
+                $unused_codes = GiftCertificate::where(function($query) use($entry_codes, $cd_codes){
+                    $query->whereNotIn('cd_code', $cd_codes)->orWhereNotIn('entry_code', $entry_codes);
+                })->whereNotNull('pin_code')
+                    ->where('date_created', '>=', $start_date)->where('date_created', '<=', $end_date)
+                    ->get()->toArray();
+                return view('admin_page2.unused_codes', compact('start_date', 'end_date', 'unused_codes'));
             }
         }
     }
@@ -729,8 +791,9 @@ class AdminController extends Controller
                 return redirect(action('AdminController@gift_certificates'));
             else
             {
+                $start_date = $end_date = '';
                 $klp_member = Member::join('woh_member_credit','woh_member_credit.woh_member', '=','woh_member.woh_member')->orderBy('woh_member.woh_member', 'ASC')->get()->toArray();
-                return view('admin_page2.cd_accounts', compact('member_tran', 'member', 'klp_member'));
+                return view('admin_page2.cd_accounts', compact('start_date', 'end_date', 'klp_member'));
             }
         }
     }
@@ -753,13 +816,75 @@ class AdminController extends Controller
                 return redirect(action('AdminController@gift_certificates'));
             else
             {
+                $start_date = $end_date = '';
                 $member_trans = new MemberTransaction;
                 $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
                     ->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_transaction.woh_member')
                     ->where(['woh_member_transaction.woh_transaction_type'=>1, 'woh_member_transaction.status'=>1])->orderBy('woh_member_transaction','desc')->get([
                         'first_name','last_name', 'change', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
                     ])->toArray();
-                return view('admin_page2.report_withdrawals', compact('member_tran'));
+                return view('admin_page2.report_withdrawals', compact('member_tran','start_date', 'end_date'));
+            }
+        }
+    }
+
+    public function post_filter_cd_accounts(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $start_date = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : '';
+                $end_date = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : '';
+                $klp_member = Member::join('woh_member_credit','woh_member_credit.woh_member', '=','woh_member.woh_member')
+                    ->where('created_at', '>=', $start_date)->where('created_at', '<=', $end_date)
+                    ->orderBy('woh_member.woh_member', 'ASC')->get()->toArray();
+                return view('admin_page2.cd_accounts', compact('start_date', 'end_date', 'klp_member'));
+            }
+        }
+    }
+
+    public function post_filter_report_withdrawals(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $start_date = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : '';
+                $end_date = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : '';
+                $member_trans = new MemberTransaction;
+                $member_tran = $member_trans->join('woh_transaction_type', 'woh_member_transaction.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                    ->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_transaction.woh_member')
+                    ->where('transaction_date', '>=', $start_date)->where('transaction_date', '<=', $end_date)
+                    ->where(['woh_member_transaction.woh_transaction_type'=>1, 'woh_member_transaction.status'=>1])->orderBy('woh_member_transaction','desc')->get([
+                        'first_name','last_name', 'change', 'woh_member_transaction', 'tran_amount', 'tax', 'transaction_date', 'cd_payment', 'woh_member_transaction.status AS w_status', 'notes', 'woh_member.status AS m_status'
+                    ])
+                    ->toArray();
+                return view('admin_page2.report_withdrawals', compact('start_date', 'end_date', 'member_tran'));
             }
         }
     }

@@ -7,11 +7,14 @@
                 <div class="row">
                     <div class="span12">
                         <div class="widget widget-table action-table">
+                            <form action="{{action('AdminController@post_filter_release_codes')}}" method="post">
                             <div class="widget-header"> <i class="icon-th-list"></i>
                                 <h3>Release Codes Report</h3>
-                                From: <input type="text" id="start_date" style="margin-top: 6px;"> To:
-                                <input type="text" id="end_date" style="margin-top: 6px;">
+                                From: <input type="text" id="start_date" style="margin-top: 6px;" name="start_date" value="{{ $start_date ? \Carbon\Carbon::parse($start_date)->format('m/d/Y') : '' }}"> To:
+                                <input type="text" id="end_date" style="margin-top: 6px;" name="end_date" value="{{ $end_date ? \Carbon\Carbon::parse($end_date)->format('m/d/Y') : '' }}">
+                                <input type="submit" value="Filter Results" style="margin-top: 6px;" name="submit">
                             </div>
+                            </form>
                             <!-- /widget-header -->
                             <div class="widget-content"   style="overflow: scroll; max-height: 500px">
                                 <table class="table table-striped table-bordered">
@@ -39,7 +42,7 @@
                                         @endforeach
                                     @endif
                                     <tr>
-                                        <td colspan="5"><b>Totals Member ==> {{ number_format(count($klp_member)) }}</b></td>
+                                        <td colspan="6"><b>Totals Member ==> {{ number_format(count($klp_member)) }}</b></td>
                                     </tr>
                                     </tbody>
                                 </table>

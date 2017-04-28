@@ -200,8 +200,16 @@
         $('.code').click(function () {
             $('#pin_code').prop('checked',true);
             $('#pin_code').prop('disabled',true);
-            $('input[name="gc_number"]').val(4);
-            $('input[name="gc_number"]').prop('readonly',true)
+            if($(this).val() != 5)
+            {
+                $('input[name="gc_number"]').val(4);
+                $('input[name="gc_number"]').prop('readonly',true);
+            }
+            else
+            {
+                $('input[name="gc_number"]').val('');
+                $('input[name="gc_number"]').prop('readonly',false);
+            }
         });
 
         $("#print").click(function(e){
