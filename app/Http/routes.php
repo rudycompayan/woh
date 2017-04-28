@@ -36,6 +36,7 @@ Route::get('/admin_reports_cd_accounts', 'AdminController@cd_accounts');
 Route::get('/admin_reports_klp_member_list', 'AdminController@klp_member_list');
 Route::get('/admin_reports_redeemed_gc', 'AdminController@report_redeemed_gc');
 Route::get('/admin_reports_withdrawals', 'AdminController@report_withdrawals');
+Route::get('/admin_reports_member_earnings', 'AdminController@report_member_earnings');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
@@ -49,6 +50,7 @@ Route::post('/admin_reports_cd_accounts_filter', 'AdminController@post_filter_cd
 Route::post('/admin_reports_withdrawals_filter', 'AdminController@post_filter_report_withdrawals');
 Route::post('/admin_reports_release_codes_filter', 'AdminController@post_filter_release_codes');
 Route::post('/admin_reports_unused_codes_filter', 'AdminController@post_filter_unused_codes');
+Route::post('/admin_reports_member_earnings_filter', 'AdminController@post_filter_member_earnings');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

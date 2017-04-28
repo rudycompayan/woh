@@ -33,7 +33,7 @@
                                         <i class="shortcut-icon icon-signal"></i>
                                         <span class="shortcut-label">KLP Member List</span>
                                     </a>
-                                    <a href="{{action('AdminController@redeem_gc')}}" class="shortcut">
+                                    <a href="{{action('AdminController@report_member_earnings')}}" class="shortcut">
                                         <i class="shortcut-icon icon-tag"></i>
                                         <span class="shortcut-label">Members Earning Report</span>
                                     </a>
