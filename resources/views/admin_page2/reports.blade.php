@@ -25,7 +25,7 @@
                                         <i class="shortcut-icon icon-bookmark"></i>
                                         <span class="shortcut-label">Member Withdrawals</span>
                                     </a>
-                                    <a href="javascript:;" class="shortcut">
+                                    <a href="{{action('AdminController@report_unilevel')}}" class="shortcut">
                                         <i class="shortcut-icon icon-list-alt"></i>
                                         <span class="shortcut-label">Unilevel Report</span>
                                     </a>
@@ -41,7 +41,7 @@
                                         <i class="shortcut-icon icon-user"></i>
                                         <span class="shortcut-label">CD Accounts</span>
                                     </a>
-                                    <a href="{{action('AdminController@gift_certificates')}}" class="shortcut">
+                                    <a href="{{action('AdminController@report_redeemed_gc')}}" class="shortcut">
                                         <i class="shortcut-icon icon-picture"></i>
                                         <span class="shortcut-label">Redeemed Gift Certificates</span>
                                     </a>

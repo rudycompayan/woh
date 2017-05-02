@@ -1137,6 +1137,228 @@ class AdminController extends Controller
         return view('admin_page2.report_member_earnings', compact('all_report', 'name'));
     }
 
+    public function report_unilevel(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = "";
+                $member_all = new Member;
+                $member_all = $member_all->orderBy('first_name','ASC')->get()->toArray();
+                $all_report = [];
+                if(!empty($member_all))
+                {
+                    foreach ($member_all as $ma)
+                    {
+                        $level_arr = [];
+                        $member_tran = [];
+                        $member = new Member;
+                        $member = $member->where('woh_member',$ma['woh_member'])->get();
+
+                        $level_pair = new DownlineLevel;
+                        $level = $level_pair->where(['parent_member'=>$ma['woh_member']])->max('level');
+
+                        if($level > 0)
+                        {
+                            $level = [];
+                            $member_maintenance = Unilevel::where('woh_member',$ma['woh_member'])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                            $downlines = Member::where('sponsor',$ma['woh_member'])->get(['woh_member'])->toArray();
+                            if(!empty($downlines))
+                            {
+                                foreach($downlines as $dl)
+                                {
+                                    $level[1][] = $dl['woh_member'];
+                                }
+                                $x=1;
+                                while(!empty($level[$x]))
+                                {
+                                    $level[] = $this->unilevel_dp($level[$x], $x);
+                                    $x++;
+                                }
+                            }
+                            if(!empty($level))
+                            {
+                                for($i=1; $i<= count($level); $i++)
+                                {
+                                    if(!empty($level[$i]))
+                                    {
+                                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                                        $member_tran[] = [
+                                            "woh_member_transaction" => "----------",
+                                            "woh_member" => null,
+                                            "woh_transaction_type" => 8,
+                                            "transaction_date" => Carbon::now(),
+                                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
+                                            "transaction_referred" => null,
+                                            "no_of_pairs" => null,
+                                            "status" => 1,
+                                            "transaction_type" => "Unilevel Earnings",
+                                            "level" => $i
+                                        ];
+                                    }
+                                }
+                            }
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
+                        }
+                        else
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = [];
+                    }
+                }
+            }
+        }
+        return view('admin_page2.report_unilevel', compact('all_report', 'name'));
+    }
+
+    public function post_filter_unilevel(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = $request->name;
+                $member_all = new Member;
+                $member_all = $member_all->where('first_name','like','%'.$name.'%')->orWhere('last_name','like','%'.$name.'%')->orWhere('username','like','%'.$name.'%')->orWhere('woh_member','like','%'.$name.'%')->orderBy('first_name','ASC')->get()->toArray();
+                $all_report = [];
+                if(!empty($member_all))
+                {
+                    foreach ($member_all as $ma)
+                    {
+                        $level_arr = [];
+                        $member_tran = [];
+                        $member = new Member;
+                        $member = $member->where('woh_member',$ma['woh_member'])->get();
+
+                        $level_pair = new DownlineLevel;
+                        $level = $level_pair->where(['parent_member'=>$ma['woh_member']])->max('level');
+
+                        if($level > 0)
+                        {
+                            $level = [];
+                            $member_maintenance = Unilevel::where('woh_member',$ma['woh_member'])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                            $downlines = Member::where('sponsor',$ma['woh_member'])->get(['woh_member'])->toArray();
+                            if(!empty($downlines))
+                            {
+                                foreach($downlines as $dl)
+                                {
+                                    $level[1][] = $dl['woh_member'];
+                                }
+                                $x=1;
+                                while(!empty($level[$x]))
+                                {
+                                    $level[] = $this->unilevel_dp($level[$x], $x);
+                                    $x++;
+                                }
+                            }
+                            if(!empty($level))
+                            {
+                                for($i=1; $i<= count($level); $i++)
+                                {
+                                    if(!empty($level[$i]))
+                                    {
+                                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
+                                        $member_tran[] = [
+                                            "woh_member_transaction" => "----------",
+                                            "woh_member" => null,
+                                            "woh_transaction_type" => 8,
+                                            "transaction_date" => Carbon::now(),
+                                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
+                                            "transaction_referred" => null,
+                                            "no_of_pairs" => null,
+                                            "status" => 1,
+                                            "transaction_type" => "Unilevel Earnings",
+                                            "level" => $i
+                                        ];
+                                    }
+                                }
+                            }
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
+                        }
+                        else
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = [];
+                    }
+                }
+            }
+        }
+        return view('admin_page2.report_unilevel', compact('all_report', 'name'));
+    }
+
+    public function report_redeemed_gc(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = "";
+                $gc = GiftCertificate::where(['status' => 2])->orderBy('to','ASC')->get()->toArray();
+            }
+        }
+        return view('admin_page2.report_redeemed_gc', compact('gc', 'name'));
+    }
+
+    public function post_filter_redeemed_gc(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = $request->name;
+                $gc = GiftCertificate::where(['status' => 2])->where(function ($query) use($name){
+                    $query->where('to','like','%'.$name.'%')->orWhere('bar_code','like','%'.$name.'%');
+                })->orderBy('to','ASC')->get()->toArray();
+            }
+        }
+        return view('admin_page2.report_redeemed_gc', compact('gc', 'name'));
+    }
+
     public function db_backup(Request $request)
     {
         return view('admin_page2.db_backup', compact('all_report', 'name'));
