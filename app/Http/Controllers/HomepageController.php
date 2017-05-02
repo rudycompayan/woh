@@ -32,6 +32,11 @@ class HomepageController extends Controller
         return view('main_page.about_page');
     }
 
+    public function marketing_plan()
+    {
+        return view('main_page.marketing_plan');
+    }
+
     public function post_contact_page(Requests\ContactRequest $request)
     {
         $transport = \Swift_MailTransport::newInstance();

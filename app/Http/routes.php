@@ -15,6 +15,7 @@ Route::get('/', 'HomepageController@index');
 Route::get('/contact', 'HomepageController@contact_page');
 Route::get('/gallery', 'HomepageController@gallery_page');
 Route::get('/about', 'HomepageController@about_page');
+Route::get('/marketing-plan', 'HomepageController@marketing_plan');
 
 Route::post('/contact', 'HomepageController@post_contact_page');
 

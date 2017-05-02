@@ -173,7 +173,7 @@
 
                <div class="extra-wrap">
 
-                  <a href="#">Marketing</a>
+                  <a href="{{ action('HomepageController@marketing_plan') }}">Marketing</a>
 
                   <p>Invite and earn</p>
 

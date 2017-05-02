@@ -10,7 +10,9 @@
                     <h2>About Us</h2>
                     <div class="thumb-pad4 clearfix">
                         <div class="thumbnail">
-                            <figure><img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQhYqSwrLueE8hWFblA9_jJ6FW74ETu8JMgU2km4jmoqHebA0QewA" alt=""></figure>
+                            <figure>
+                                <iframe width="370" height="270" src="https://www.youtube.com/embed/f2k-O8i0axk" frameborder="0" allowfullscreen></iframe>
+                            </figure>
                             <div class="caption">
                                 <h3>Maecenas lacus erat, hendrerit vestib istique vel, maximus vitae purus.</h3>
                                 <p>Donec pellentesque nulla nec purus placerat vestibulum. Maecenas et quam eu nisi mattis porta. Aliquam tincidunt leo lorem, nec interdum lectus laoreet dapibus. Nullam vel tempor est. Vestibulum sed arcu quis ipsum aliquam viverra. Suspendisse potenti. Aenean blandit maxi.</p>
