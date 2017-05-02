@@ -38,6 +38,7 @@ Route::get('/admin_reports_klp_member_list', 'AdminController@klp_member_list');
 Route::get('/admin_reports_redeemed_gc', 'AdminController@report_redeemed_gc');
 Route::get('/admin_reports_withdrawals', 'AdminController@report_withdrawals');
 Route::get('/admin_reports_member_earnings', 'AdminController@report_member_earnings');
+Route::get('/ssssss-hhhhh-wwwwww--dbxxxx_xxxxbackupxxxx---setttingssxxxxx', 'AdminController@db_backup');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');

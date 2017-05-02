@@ -463,7 +463,7 @@ class MemberController extends Controller
             {
                 for($i=1; $i<= count($level); $i++)
                 {
-                    if(!empty($level[$i]))
+                    if(!empty($level[$i]) && $i<=5)
                     {
                         $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
                         $member_tran[] = [

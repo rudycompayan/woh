@@ -10,7 +10,7 @@
                             <form action="{{action('AdminController@post_filter_member_earnings')}}" method="post">
                                 <div class="widget-header"> <i class="icon-th-list"></i>
                                     <h3>Member Earnings Report</h3>
-                                    <input type="text" style="margin-top: 6px;" name="name" placeholder="Seacrh name here..." value="{{ $name }}">
+                                    <input type="text" style="margin-top: 6px;" name="name" placeholder="Search here..." value="{{ $name }}">
                                     <input type="submit" value="Search" style="margin-top: 6px;" name="submit">
                                 </div>
                             </form>

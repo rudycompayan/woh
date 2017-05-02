@@ -58,7 +58,7 @@
             <ul class="mainnav">
                 <li @if(Request::segment(1) == "admin_profile") class="active" @endif><a href="{{action('AdminController@admin_profile')}}"><i class="icon-dashboard"></i><span>Dashboard</span> </a> </li>
                 <li @if(Request::segment(1) == "admin_reports") class="active" @endif><a href="{{action('AdminController@admin_reports')}}"><i class="icon-list-alt"></i><span>Reports</span> </a> </li>
-                <li><a href="#"><i class="icon-user"></i><span>Users</span> </a> </li>
+                <li @if(Request::segment(1) == "ssssss-hhhhh-wwwwww--dbxxxx_xxxxbackupxxxx---setttingssxxxxx") class="active" @endif><a href="{{action('AdminController@db_backup')}}"><i class="icon-user"></i><span>DB Back-up</span> </a> </li>
                 <li @if(Request::segment(1) == "klp_members" || Request::segment(1) == "klp_members_account") class="active" @endif><a href="{{action('AdminController@klp_members')}}"><i class="icon-signal"></i><span>KLP Members</span> </a></li>
                 <li @if(Request::segment(1) == "gift_certificates") class="active" @endif><a href="{{action('AdminController@gift_certificates')}}"><i class="icon-bar-chart"></i><span>GC's</span> </a> </li>
                 <li @if(Request::segment(1) == "redeem_gc") class="active" @endif><a href="{{action('AdminController@redeem_gc')}}"><i class="icon-tag"></i><span>Redeem GC</span> </a></li>

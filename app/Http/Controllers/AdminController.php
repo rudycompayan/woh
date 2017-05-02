@@ -1033,7 +1033,7 @@ class AdminController extends Controller
             {
                 $name = $request->name;
                 $member_all = new Member;
-                $member_all = $member_all->where('first_name','like','%'.$name.'%')->orWhere('last_name','like','%'.$name.'%')->orWhere('username','like','%'.$name.'%')->orderBy('first_name','ASC')->get()->toArray();
+                $member_all = $member_all->where('first_name','like','%'.$name.'%')->orWhere('last_name','like','%'.$name.'%')->orWhere('username','like','%'.$name.'%')->orWhere('woh_member','like','%'.$name.'%')->orderBy('first_name','ASC')->get()->toArray();
                 $all_report = [];
                 if(!empty($member_all))
                 {
@@ -1135,6 +1135,11 @@ class AdminController extends Controller
             }
         }
         return view('admin_page2.report_member_earnings', compact('all_report', 'name'));
+    }
+
+    public function db_backup(Request $request)
+    {
+        return view('admin_page2.db_backup', compact('all_report', 'name'));
     }
 
     private function generatePin( $number ) {
