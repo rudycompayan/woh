@@ -42,7 +42,7 @@
                                         @endforeach
                                     @endif
                                     <tr>
-                                        <td colspan="5"><b>Totals ==> {{ number_format(count($unused_codes)) }}</b></td>
+                                        <td colspan="6"><b>Totals ==> {{ number_format(count($unused_codes)) }}</b></td>
                                     </tr>
                                     </tbody>
                                 </table>

@@ -39,7 +39,11 @@ class AdminController extends Controller
         elseif($admin[0]['user_type'] == 'accounting')
             return redirect(action('AdminController@gift_certificates'));
         else
-            return view('admin_page2.admin_profile', compact('admin'));
+        {
+            $member_all = new Member;
+            $member_all = $member_all->count();
+            return view('admin_page2.admin_profile', compact('admin', 'member_all'));
+        }
     }
 
     public function admin_login(Request $request)
