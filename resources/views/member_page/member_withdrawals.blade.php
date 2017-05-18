@@ -91,6 +91,14 @@
             padding: 3px 7px!important;
         }
 
+        .withdraw-gc-btn {
+            float: left;
+            margin-bottom: 10px;
+            margin-left: 10px;
+            margin-top: 39px;
+            width: 100px;
+        }
+
     </style>
 
     <script type="text/javascript" src="member_page/prettify.js"></script>
@@ -102,7 +110,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="member_page/jquery.jOrgChart.js"></script>
     <script>
-        var dialog2, form2, dialog3, form3, dialog4, form4;
+        var dialog2, form2, dialog3, form3, dialog4, form4, form5;
         jQuery(document).ready(function() {
             $( "#my-account" ).on( "click", function(e) {
                 e.preventDefault();
@@ -125,6 +133,12 @@
             $( "#unilevel-link" ).on( "click", function(e) {
                 e.preventDefault();
                 dialog4.dialog("open");
+            });
+
+            $( "#withdraw-gc-btn" ).on( "click", function(e) {
+                e.preventDefault();
+                $('#gc_ohqty').text($('#gc_qty').text());
+                dialog5.dialog("open");
             });
 
             dialog2 = $( "#dialog-form2" ).dialog({
@@ -381,6 +395,109 @@
                 event.preventDefault();
             });
 
+            dialog5 = $( "#dialog-form5" ).dialog({
+                autoOpen: false,
+                height: 480,
+                width: 800,
+                modal: true,
+                buttons: {
+                    "Send Claim Request": function(){
+
+                        if(!$('#qty').val())
+                        {
+                            alert('Please enter no. of GC to claim.');
+                            $('#qty').focus();
+                            return false;
+                        }
+
+                        var a=$('#gc_ohqty').text();
+                        a=a.replace(/\,/g,'');
+                        a=a.replace(/\₱/g,'');
+                        a=parseFloat(a);
+                        if($('#qty').val() > a)
+                        {
+                            alert('Quantity must be less than or equal to your On-Hand quantity.');
+                            $('#qty').focus();
+                            return false;
+                        }
+
+                        if(!$('#gc_notes').val())
+                        {
+                            alert('Please enter notes.');
+                            $('#gc_notes').focus();
+                            return false;
+                        }
+
+                        $('#ajax-loader').fadeIn();
+                        $.ajax({
+
+                            type: "POST",
+
+                            url: form5.prop('action'),
+
+                            data: form5.serialize(),
+
+                            success: function(data, NULL, jqXHR) {
+                                $('#ajax-loader').fadeOut();
+                                if(jqXHR.status === 200 ) {//redirect if  authenticated user.
+                                    $( location ).prop( 'pathname', '/member_withdrawals');
+                                }
+                            },
+                            error: function(data) {
+                                $('#ajax-loader').fadeOut();
+                                if( data.status === 401 ) {//redirect if not authenticated user
+                                    alert("Member not found!");
+                                }
+                                if( data.status === 422 ) {
+                                    //process validation errors here.
+                                    var err_msg = '';
+                                    var res = JSON.parse(data.responseText);
+                                    for (var key in res) {
+                                        if (res.hasOwnProperty(key)) {
+                                            var obj = res[key];
+                                            for (var prop in obj) {
+                                                if (obj.hasOwnProperty(prop)) {
+                                                    err_msg += '<p>'+obj[prop] + "</p>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $('#first_name').focus();
+                                    $('#form5_error').html(err_msg);
+                                    $('#form5_error').fadeIn();
+                                }
+                            }
+                        });
+                    },
+                    Cancel: function() {
+                        dialog5.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    $('#form1_error').html('');
+                    $('#form1_error').fadeOut();
+                    form5[ 0 ].reset();
+                },
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+
+            form5 = dialog5.find( "form" ).on( "submit", function( event ) {
+                event.preventDefault();
+            });
+
+            $('input[name="qty"]').keyup(function(e)
+            {
+                var txtQty = $(this).val().replace(/[^0-9\.]/g,'');
+                $(this).val(txtQty);
+            });
+
         });
     </script>
 </head>
@@ -405,6 +522,7 @@
 
 <div class="container" style="text-align: center; width:100%;">
     <a href="" id="withdraw-btn"><img src="member_page/images/withdraw.png" class="withdraw-btn"></a>
+    <a href="" id="withdraw-gc-btn"><img src="member_page/images/withdraw-gc.png" class="withdraw-gc-btn"></a>
     <table class="table-grid" cellspacing="0" style="font: 12px">
         <thead>
         <tr>
@@ -516,12 +634,20 @@
         </tr>
         <tr style="color: #2b542c;background-color: #efefef">
             <td class='rows' colspan="10"  style="color: #2b542c;">Total Gc's ==></td>
-            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals"><b>{{ number_format($gc/500) }} X &#8369; 300 = &#8369; {{ number_format($gc,2) }}</b></span></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals"><b>{{ number_format($gc/300) }} X &#8369; 300 = &#8369; {{ number_format($gc,2) }}</span></td>
+        </tr>
+        <tr style="color: #2b542c;background-color: #FFFFFF">
+            <td class='rows' colspan="10"  style="color: #2b542c;">Total GC Claimed ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals-w"><b>{{ number_format($member_gc_claim) }} X &#8369; 300 = &#8369; {{ number_format(($member_gc_claim*300),2) }}</span></td>
+        </tr>
+        <tr style="color: #2b542c;background-color: #efefef">
+            <td class='rows' colspan="10"  style="color: #2b542c;">Total GC On Hand ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><span class="totals-b"><b><span id="gc_qty">{{ number_format(($gc/300)-$member_gc_claim) }} </span> X &#8369; 300 = &#8369; {{ number_format($gc - ($member_gc_claim*300),2) }}</span></td>
         </tr>
         <tr style="color: #2b542c;">
             <td class='rows' colspan="10"  style="color: #2b542c;">Total Earnings ==></td>
             <td class='rows'  style="color: #2b542c;"></td>
-            <td class='rows' align="right" style="color: #2b542c;"><span class="totals"><b>&#8369; {{ number_format(($earn+$gc),2) }}</b></span></td>
+            <td class='rows' align="right" style="color: #2b542c;"><span class="totals"><b>&#8369; {{ number_format(($earn+($gc-($member_gc_claim*300))),2) }}</b></span></td>
         </tr>
         <tr style="color: #2b542c;">
             <td class='rows' colspan="10"  style="color: #2b542c;">Total Unilevel Commision ==></td>
@@ -595,6 +721,19 @@
     <fieldset>
         <label for="amount" style="font-size:14px;">Enter Product Code</label>
         <input type="text" name="product_code" id="product_code" placeholder="XXXXXXXXXX" class="text ui-widget-content ui-corner-all">
+        <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
+    </fieldset>
+    {!! Form::close() !!}
+    <button id="create-user" style="display: none">Create new user</button>
+</div>
+<div id="dialog-form5" title="GC Claim Request">
+    {!! Form::open(['data-remote','url' => action('MemberController@post_member_gc_claim'), 'id' => 'login_form']) !!}
+    <fieldset>
+        <div id="form5_error" class="alert alert-danger" role="alert">On-Hand GC: <span id="gc_ohqty">0</span> </div>
+        <label for="amount">GC Quantity</label>
+        <input type="text" name="qty" id="qty" placeholder="0" class="text ui-widget-content ui-corner-all">
+        <label for="notes">Notes</label>
+        <textarea name="notes" id="gc_notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all" style="width:95%; height: 150px;"></textarea>
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
     </fieldset>
     {!! Form::close() !!}

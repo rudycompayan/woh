@@ -8,6 +8,7 @@ use App\Models\GCSet;
 use App\Models\GiftCertificate;
 use App\Models\Member;
 use App\Models\MemberCredit;
+use App\Models\MemberGC;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
 use App\Models\Unilevel;
@@ -1366,6 +1367,63 @@ class AdminController extends Controller
     public function db_backup(Request $request)
     {
         return view('admin_page2.db_backup', compact('all_report', 'name'));
+    }
+
+    public function gc_claim_request(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $member_gc = new MemberGC;
+                $member_gc = $member_gc->join('woh_member', 'woh_member.woh_member', '=', 'woh_member_gc.woh_member')->whereNull('woh_gc')->orderBy('date_claim', 'DESC')->get()->toArray();
+            }
+        }
+        return view('admin_page2.gc_claim_request', compact('member_gc'));
+    }
+
+    public function post_gc_claim_request(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $woh_gc = GiftCertificate::where('bar_code',$request->barcode)->pluck('woh_gc')->toArray();
+                if(empty($woh_gc))
+                {
+                    return response(['msg' => 'GC not found'], 401)// 401 Status Code: Forbidden, needs authentication
+                    ->header('Content-Type', 'application/json');
+                }
+                $member_gc = new MemberGC;
+                $member_gc->where('woh_member_gc', $request->woh_member_gc)->update(['woh_gc' => $woh_gc[0]]);
+            }
+        }
+        return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
+        ->header('Content-Type', 'application/json');
     }
 
     private function generatePin( $number ) {

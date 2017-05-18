@@ -7,7 +7,7 @@
                 <h2>KLP Marketing Plan</h2>
                 <div class="row">
                     <div class="col-md-12">
-                        <video width="100%" controls>
+                        <video width="100%">
                             <source src="main_page/img/marketing_plan.mp4" type="video/mp4">
                         </video>
                     </div>

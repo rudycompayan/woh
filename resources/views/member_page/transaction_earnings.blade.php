@@ -327,12 +327,20 @@
         </tr>
         <tr style="color: #2b542c;background-color: #efefef">
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Gc's ==></td>
-            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><b>{{ number_format($gc/500) }} X &#8369; 300 = &#8369; {{ number_format($gc,2) }}</b></td>
+            <td class='rows' colspan="2" align="right" style="color: #2b542c;"><b>{{ number_format($gc/300) }} X &#8369; 300 = &#8369; {{ number_format($gc,2) }}</b></td>
+        </tr>
+        <tr style="color: #761c19;background-color: #FFFFFF">
+            <td class='rows' colspan="4"  style="color: #761c19;">Total GC Claim ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #761c19;"><b>{{ number_format($member_gc_claim) }} X &#8369; 300 = &#8369; {{ number_format($member_gc_claim*300,2) }}</b></td>
+        </tr>
+        <tr style="color: #2a6496;background-color: #efefef">
+            <td class='rows' colspan="4"  style="color: #2a6496;">Total On Hand GC ==></td>
+            <td class='rows' colspan="2" align="right" style="color: #2a6496"><b>{{ number_format(($gc/300)-$member_gc_claim) }} X &#8369; 300 = &#8369; {{ number_format($gc-($member_gc_claim*300),2) }}</b></td>
         </tr>
         <tr style="color: #2b542c">
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Earned ==></td>
             <td class='rows'  style="color: #2b542c;"></td>
-            <td class='rows' align="right" style="color: #2b542c;"><b>&#8369; {{ number_format(($earn+$gc),2) }}</b></td>
+            <td class='rows' align="right" style="color: #2b542c;"><b>&#8369; {{ number_format(($earn+($gc-($member_gc_claim*300))),2) }}</b></td>
         </tr>
         <tr style="color: #2b542c">
             <td class='rows' colspan="4"  style="color: #2b542c;">Total Unilevel Commision ==></td>

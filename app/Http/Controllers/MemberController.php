@@ -6,6 +6,7 @@ use App\Models\DownlineLevel;
 use App\Models\GiftCertificate;
 use App\Models\Member;
 use App\Models\MemberCredit;
+use App\Models\MemberGC;
 use App\Models\MemberTransaction;
 use App\Models\ShortCodes;
 use App\Models\Unilevel;
@@ -482,7 +483,8 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit'));
+        $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
+        return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit', 'member_gc_claim'));
     }
 
     public function member_withdrawals(Request $request)
@@ -583,7 +585,8 @@ class MemberController extends Controller
                 }
             }
         }
-        return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit'));
+        $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
+        return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit', 'member_gc_claim'));
     }
 
     public function post_member_withdrawal(Request $request)
@@ -648,6 +651,30 @@ class MemberController extends Controller
         }
     }
 
+    public function post_member_gc_claim(Request $request)
+    {
+        if ($request->session()->get('woh_member'))
+        {
+            $member = new Member;
+            $member = $member->where('woh_member',$request->session()->get('woh_member'))->get()->toArray();
+            $cd_payment = null;
+            $change = null;
+            $tran_data = [
+                "woh_member" => $request->woh_member,
+                "date_claim" => Carbon::now(),
+                "woh_gc" => null,
+                "notes" => $request->notes,
+                "gc_qty" => $request->qty
+            ];
+            MemberGC::create($tran_data);
+            return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
+            ->header('Content-Type', 'application/json');
+        }
+
+        return response(['msg' => 'Member not found!'], 401) // 401 Status Code: Forbidden, needs authentication
+        ->header('Content-Type', 'application/json');
+    }
+
     private function unilevel_dp($woh_member, $level)
     {
         $downlines_level = [];
@@ -665,5 +692,6 @@ class MemberController extends Controller
         }
         return $downlines_level;
     }
+
 
 }

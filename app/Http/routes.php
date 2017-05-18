@@ -41,6 +41,7 @@ Route::get('/admin_reports_member_earnings', 'AdminController@report_member_earn
 Route::get('/admin_reports_unilevel', 'AdminController@report_unilevel');
 Route::get('/admin_reports_redeemed_gc', 'AdminController@report_redeemed_gc');
 Route::get('/ssssss-hhhhh-wwwwww--dbxxxx_xxxxbackupxxxx---setttingssxxxxx', 'AdminController@db_backup');
+Route::get('/gc_claim_request', 'AdminController@gc_claim_request');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
@@ -57,6 +58,7 @@ Route::post('/admin_reports_unused_codes_filter', 'AdminController@post_filter_u
 Route::post('/admin_reports_member_earnings_filter', 'AdminController@post_filter_member_earnings');
 Route::post('/admin_reports_unilevel_filter', 'AdminController@post_filter_unilevel');
 Route::post('/admin_reports_redeemed_gc_filter', 'AdminController@post_filter_redeemed_gc');
+Route::post('/gc_claim_request', 'AdminController@post_gc_claim_request');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');
@@ -69,5 +71,6 @@ Route::post('/member_update', 'MemberController@post_member_update');
 Route::post('/member_withdrawal', 'MemberController@post_member_withdrawal');
 Route::post('/member_unilevel', 'MemberController@post_member_unilevel');
 Route::post('/member_search', 'MemberController@post_member_search');
+Route::post('/member_gc', 'MemberController@post_member_gc_claim');
 
 

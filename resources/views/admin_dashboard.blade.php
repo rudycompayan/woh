@@ -64,6 +64,7 @@
                 <li @if(Request::segment(1) == "redeem_gc") class="active" @endif><a href="{{action('AdminController@redeem_gc')}}"><i class="icon-tag"></i><span>Redeem GC</span> </a></li>
                 <li @if(Request::segment(1) == "short_codes") class="active" @endif><a href="{{action('AdminController@short_codes')}}"><i class="icon-code"></i><span>Shortcodes</span> </a> </li>
                 <li @if(Request::segment(1) == "withdrawal_request") class="active" @endif><a href="{{action('AdminController@withdrawal_request')}}"> <i class="icon-long-arrow-down"></i><span>Withdrawal Request</span> <b class="caret"></b></a>
+                <li @if(Request::segment(1) == "gc_claim_request") class="active" @endif><a href="{{action('AdminController@gc_claim_request')}}"> <i class="icon-long-arrow-down"></i><span>GC Claim Request</span> <b class="caret"></b></a>
                 {{--    <ul class="dropdown-menu">
                         <li><a href="icons.html">Icons</a></li>
                         <li><a href="faq.html">FAQ</a></li>
