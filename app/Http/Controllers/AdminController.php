@@ -1375,8 +1375,11 @@ class AdminController extends Controller
                                 'woh_member' => $m['woh_member'],
                                 'period_cover_start' => $months_accumulator,
                                 'period_cover_end' => $months_plus_1,
-                                'level' => null,
-                                'amount_earn' => 0,
+                                'level1_earn' => 0,
+                                'level5_earn' => 0,
+                                'level2_earn' => 0,
+                                'level3_earn' => 0,
+                                'level4_earn' => 0,
                                 'status' => 0
                             ]);
                         }
