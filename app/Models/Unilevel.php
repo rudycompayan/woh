@@ -12,6 +12,7 @@ class Unilevel extends Model
     protected $fillable = [
         'woh_member',
         'product_code',
-        "date_encoded"
+        "date_encoded",
+        "woh_member_unilevel_earning"
     ];
 }

@@ -317,7 +317,7 @@
 
             dialog4 = $( "#dialog-form4" ).dialog({
                 autoOpen: false,
-                height: 200,
+                height: 250,
                 width: 800,
                 modal: true,
                 buttons: {
@@ -344,6 +344,7 @@
                                 if(jqXHR.status === 200 ) {//redirect if  authenticated user.
                                     alert("Product code successfully save.");
                                     dialog4.dialog( "close" );
+                                    location.href="{{ action('MemberController@member_withdrawals') }}";
                                 }
                             },
                             error: function(data) {
@@ -719,6 +720,14 @@
 <div id="dialog-form4" title="Unilevel Commision">
     {!! Form::open(['data-remote','url' => action('MemberController@post_member_unilevel'), 'id' => 'unilevel_form']) !!}
     <fieldset>
+        <label for="amount" style="font-size:14px;">Period Cover</label>
+        <select name="period_cover" class="select ui-widget-content ui-corner-all" style="width:95%">
+            @if(!empty($unilevel_period))
+                @foreach($unilevel_period as $up)
+                    <option value="{!! $up['woh_member_unilevel_earning'] !!}">{!! \Carbon\Carbon::parse($up['period_cover_start'])->format('F d, Y') !!} - {!! \Carbon\Carbon::parse($up['period_cover_end'])->format('F d, Y') !!}</option>
+                @endforeach
+            @endif
+        </select> <br>
         <label for="amount" style="font-size:14px;">Enter Product Code</label>
         <input type="text" name="product_code" id="product_code" placeholder="XXXXXXXXXX" class="text ui-widget-content ui-corner-all">
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">
@@ -731,7 +740,7 @@
     <fieldset>
         <div id="form5_error" class="alert alert-danger" role="alert">On-Hand GC: <span id="gc_ohqty">0</span> </div>
         <label for="amount">GC Quantity</label>
-        <input type="text" name="qty" id="qty" placeholder="0" class="text ui-widget-content ui-corner-all">
+        <input type="text" name="qty" id="qty" placeholder="0" value="1" readonly class="text ui-widget-content ui-corner-all">
         <label for="notes">Notes</label>
         <textarea name="notes" id="gc_notes" placeholder="Some text here." class="text ui-widget-content ui-corner-all" style="width:95%; height: 150px;"></textarea>
         <input type="hidden" name="woh_member" value="{!! $member[0]->woh_member !!}">

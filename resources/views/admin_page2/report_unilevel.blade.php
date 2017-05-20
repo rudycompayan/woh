@@ -20,39 +20,41 @@
                                     <thead>
                                     <tr>
                                         <th>Member Details</th>
+                                        <th>Period Cover</th>
+                                        <th>Maintain?</th>
                                         <th>Level 1</th>
                                         <th>Level 2</th>
                                         <th>Level 3</th>
                                         <th>Level 4</th>
                                         <th>Level 5</th>
-                                        <th>Total</th>
+                                        <th style="font-weight: bold">Total</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if(isset($all_report))
-                                        @foreach($all_report as $key => $member_report)
+                                    <?php
+                                    $footer_total = 0;
+                                    ?>
+                                    @if(isset($unilevel_period))
+                                        @foreach($unilevel_period as $up)
                                                 <?php
-                                                $earn = 0;
-                                                $withdrawals = 0;
-                                                $gc = 0;
-                                                $unilevels_total = 0;
+                                                $footer_total = $footer_total + $up['level1_earn']+$up['level2_earn']+$up['level3_earn']+$up['level4_earn']+$up['level5_earn'];
                                                 ?>
                                                 <tr>
-                                                    <td>{!! $key !!}</td>
-                                                @for($x=0; $x<5; $x++)
-                                                    <?php
-                                                    if(isset($member_report[0][$x]) && $member_report[0][$x]['woh_transaction_type'] == 8)
-                                                        $unilevels_total += $member_report[0][$x]['tran_amount'];
-                                                    ?>
-                                                    @if(isset($member_report[0][$x]))
-                                                        <td>&#8369; {!! number_format($member_report[0][$x]['tran_amount'],2) !!}</td>
-                                                    @else
-                                                        <td>&#8369; 0.00</td>
-                                                    @endif
-                                                @endfor
-                                                    <td>&#8369; {!! number_format($unilevels_total,2) !!}</td>
+                                                    <td>{!! $up['woh_member']." - ".$up['first_name'].' '.$up['last_name']." (".$up['username'].")" !!}</td>
+                                                    <td>{!! \Carbon\Carbon::parse($up['period_cover_start'])->format('F d, Y').' - '.\Carbon\Carbon::parse($up['period_cover_end'])->format('F d, Y') !!}</td>
+                                                    <td>{!! $up['status'] == 1 ? 'Yes' : 'No' !!}</td>
+                                                    <td>&#8369; {!! number_format($up['level1_earn'],2) !!}</td>
+                                                    <td>&#8369; {!! number_format($up['level2_earn'],2) !!}</td>
+                                                    <td>&#8369; {!! number_format($up['level3_earn'],2) !!}</td>
+                                                    <td>&#8369; {!! number_format($up['level4_earn'],2) !!}</td>
+                                                    <td>&#8369; {!! number_format($up['level5_earn'],2) !!}</td>
+                                                    <td style="font-weight: bold">&#8369; {!! number_format($up['level1_earn']+$up['level2_earn']+$up['level3_earn']+$up['level4_earn']+$up['level5_earn'],2) !!}</td>
                                                 </tr>
                                         @endforeach
+                                        <tr>
+                                            <td colspan="8" style="font-weight: bold">Totals ==></td>
+                                            <td style="font-weight: bold">&#8369; {!! number_format($footer_total,2) !!}</td>
+                                        </tr>
                                     @endif
                                     </tbody>
                                 </table>

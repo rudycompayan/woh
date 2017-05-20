@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\MemberCredit;
 use App\Models\MemberGC;
 use App\Models\MemberTransaction;
+use App\Models\MemberUnilevelEarning;
 use App\Models\ShortCodes;
 use App\Models\Unilevel;
 use Carbon\Carbon;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class MemberController extends Controller
 {
@@ -30,7 +32,8 @@ class MemberController extends Controller
         $member_heads = Member::where(['last_name'=>$member[0]->last_name, 'first_name'=>$member[0]->first_name, 'middle_name'=>$member[0]->middle_name])->count();
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
-        return view('member_page.member_profile', compact('member', 'downlines', 'member_heads'));
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        return view('member_page.member_profile', compact('member', 'downlines', 'member_heads','unilevel_period'));
     }
 
     public function post_member_search(Request $request)
@@ -444,47 +447,37 @@ class MemberController extends Controller
                     ];
                 }
             }
-            $level = [];
-            $member_maintenance = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-            $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
-            if(!empty($downlines))
+
+            $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))
+                ->groupBy('woh_member')
+                ->select([
+                    DB::raw('SUM(level1_earn) AS level1_earn'),
+                    DB::raw('SUM(level2_earn) AS level2_earn'),
+                    DB::raw('SUM(level3_earn) AS level3_earn'),
+                    DB::raw('SUM(level4_earn) AS level4_earn'),
+                    DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
+            if(!empty($unilevel_period))
             {
-                foreach($downlines as $dl)
+                for($x=1; $x<=5; $x++)
                 {
-                    $level[1][] = $dl['woh_member'];
-                }
-                $x=1;
-                while(!empty($level[$x]))
-                {
-                    $level[] = $this->unilevel_dp($level[$x], $x);
-                    $x++;
-                }
-            }
-            if(!empty($level))
-            {
-                for($i=1; $i<= count($level); $i++)
-                {
-                    if(!empty($level[$i]) && $i<=5)
-                    {
-                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                        $member_tran[] = [
-                            "woh_member_transaction" => "----------",
-                            "woh_member" => null,
-                            "woh_transaction_type" => 8,
-                            "transaction_date" => Carbon::now(),
-                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
-                            "transaction_referred" => null,
-                            "no_of_pairs" => null,
-                            "status" => 1,
-                            "transaction_type" => "Unilevel Earnings",
-                            "level" => $i
-                        ];
-                    }
+                    $member_tran[] = [
+                        "woh_member_transaction" => "----------",
+                        "woh_member" => null,
+                        "woh_transaction_type" => 8,
+                        "transaction_date" => Carbon::now(),
+                        "tran_amount" =>  $unilevel_period[0]['level'.$x.'_earn'],
+                        "transaction_referred" => null,
+                        "no_of_pairs" => null,
+                        "status" => 1,
+                        "transaction_type" => "Unilevel Earnings",
+                        "level" => $x
+                    ];
                 }
             }
         }
         $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
-        return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit', 'member_gc_claim'));
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit', 'member_gc_claim', 'unilevel_period'));
     }
 
     public function member_withdrawals(Request $request)
@@ -546,47 +539,36 @@ class MemberController extends Controller
                 }
 
             }
-            $level = [];
-            $member_maintenance = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-            $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
-            if(!empty($downlines))
+            $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))
+                ->groupBy('woh_member')
+                ->select([
+                            DB::raw('SUM(level1_earn) AS level1_earn'),
+                            DB::raw('SUM(level2_earn) AS level2_earn'),
+                            DB::raw('SUM(level3_earn) AS level3_earn'),
+                            DB::raw('SUM(level4_earn) AS level4_earn'),
+                            DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
+            if(!empty($unilevel_period))
             {
-                foreach($downlines as $dl)
+                for($x=1; $x<=5; $x++)
                 {
-                    $level[1][] = $dl['woh_member'];
-                }
-                $x=1;
-                while(!empty($level[$x]))
-                {
-                    $level[] = $this->unilevel_dp($level[$x], $x);
-                    $x++;
-                }
-            }
-            if(!empty($level))
-            {
-                for($i=1; $i<= count($level); $i++)
-                {
-                    if(!empty($level[$i]))
-                    {
-                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                        $member_tran[] = [
-                            "woh_member_transaction" => "----------",
-                            "woh_member" => null,
-                            "woh_transaction_type" => 8,
-                            "transaction_date" => Carbon::now(),
-                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
-                            "transaction_referred" => null,
-                            "no_of_pairs" => null,
-                            "status" => 1,
-                            "transaction_type" => "Unilevel Earnings",
-                            "level" => $i
-                        ];
-                    }
+                    $member_tran[] = [
+                        "woh_member_transaction" => "----------",
+                        "woh_member" => null,
+                        "woh_transaction_type" => 8,
+                        "transaction_date" => Carbon::now(),
+                        "tran_amount" =>  $unilevel_period[0]['level'.$x.'_earn'],
+                        "transaction_referred" => null,
+                        "no_of_pairs" => null,
+                        "status" => 1,
+                        "transaction_type" => "Unilevel Earnings",
+                        "level" => $x
+                    ];
                 }
             }
         }
         $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
-        return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit', 'member_gc_claim'));
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit', 'member_gc_claim', 'unilevel_period'));
     }
 
     public function post_member_withdrawal(Request $request)
@@ -642,10 +624,47 @@ class MemberController extends Controller
             $data = [
                 "woh_member" => $request->woh_member,
                 "date_encoded" => Carbon::now(),
-                "product_code" => $request->product_code
+                "product_code" => $request->product_code,
+                "woh_member_unilevel_earning" => $request->period_cover
             ];
             Unilevel::create($data);
             \DB::table('woh_short_codes')->where(['code' => $request->product_code,'type'=>5])->update(['status'=>1]);
+
+            $period_cover_count = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('woh_member_unilevel_earning', $request->period_cover)->count();
+            if($period_cover_count > 3)
+            {
+                MemberUnilevelEarning::find($request->period_cover)->update(['status'=>1]);
+                $level = [];
+                $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
+                if(!empty($downlines))
+                {
+                    foreach($downlines as $dl)
+                    {
+                        $level[1][] = $dl['woh_member'];
+                    }
+                    $x=1;
+                    while(!empty($level[$x]))
+                    {
+                        $level[] = $this->unilevel_dp($level[$x], $x);
+                        $x++;
+                    }
+                }
+                if(!empty($level))
+                {
+                    $period_covers = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('woh_member_unilevel_earning', $request->period_cover)->get()->toArray();
+                    for($i=1; $i<= 5; $i++)
+                    {
+                        if(!empty($level[$i]))
+                        {
+                            $level_count = MemberUnilevelEarning::whereIn('woh_member',$level[$i])
+                                ->whereBetween('period_cover_start', [$period_covers[0]['period_cover_start'], $period_covers[0]['period_cover_end']])
+                                ->whereBetween('period_cover_end', [$period_covers[0]['period_cover_start'], $period_covers[0]['period_cover_end']])
+                                ->where('status',1)->count();
+                            MemberUnilevelEarning::where('woh_member_unilevel_earning',$request->period_cover)->update(['level'.$i.'_earn'=>(($level_count * 500) * ($i<=2 ? .007 : .001))]);
+                        }
+                    }
+                }
+            }
             return response(['msg' => 'Login Successfull'], 200) // 200 Status Code: Standard response for successful HTTP request
             ->header('Content-Type', 'application/json');
         }
