@@ -132,7 +132,11 @@
 
             $( "#unilevel-link" ).on( "click", function(e) {
                 e.preventDefault();
-                dialog4.dialog("open");
+                @if(!empty($unilevel_period))
+                    dialog4.dialog("open");
+                @else
+                    alert('You have already maintained your account.');
+                @endif
             });
 
             $( "#withdraw-gc-btn" ).on( "click", function(e) {

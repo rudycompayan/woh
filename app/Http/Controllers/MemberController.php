@@ -32,7 +32,7 @@ class MemberController extends Controller
         $member_heads = Member::where(['last_name'=>$member[0]->last_name, 'first_name'=>$member[0]->first_name, 'middle_name'=>$member[0]->middle_name])->count();
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
-        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->where('status',0)->get()->toArray();
         return view('member_page.member_profile', compact('member', 'downlines', 'member_heads','unilevel_period'));
     }
 
@@ -476,7 +476,7 @@ class MemberController extends Controller
             }
         }
         $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
-        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->where('status',0)->get()->toArray();
         return view('member_page.transaction_earnings', compact('member_tran', 'member', 'member_credit', 'member_gc_claim', 'unilevel_period'));
     }
 
@@ -567,7 +567,7 @@ class MemberController extends Controller
             }
         }
         $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
-        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('status',0)->get()->toArray();
+        $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->where('status',0)->get()->toArray();
         return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit', 'member_gc_claim', 'unilevel_period'));
     }
 
