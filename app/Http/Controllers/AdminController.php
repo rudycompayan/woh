@@ -1313,7 +1313,10 @@ class AdminController extends Controller
             elseif($admin[0]['user_type'] == 'accounting')
                 return redirect(action('AdminController@gift_certificates'));
             else
-                return view('admin_page2.rebuild_unilevel');
+            {
+                $members = Member::orderBy('created_at', 'DESC')->get()->toArray();
+                return view('admin_page2.rebuild_unilevel', compact('members'));
+            }
         }
     }
 
@@ -1335,7 +1338,16 @@ class AdminController extends Controller
                 return redirect(action('AdminController@gift_certificates'));
             else
             {
-                $members = Member::get()->toArray();
+                if($request->woh_member_list == -1)
+                    $members = Member::get()->toArray();
+                elseif($request->woh_member_list == -2)
+                {
+                    $members = MemberUnilevelEarning::select(['woh_member_unilevel_earning.*', DB::raw('COUNT(woh_member) AS c')])
+                        ->groupBy('woh_member')->having('c', '=', 1)
+                        ->get()->toArray();
+                }
+                else
+                    $members = Member::where('woh_member', $request->woh_member_list)->get()->toArray();
                 if(!empty($members))
                 {
                     foreach ($members as $m)
@@ -1361,9 +1373,10 @@ class AdminController extends Controller
                         }
                     }
                 }
+                $members = Member::orderBy('created_at', 'DESC')->get()->toArray();
             }
         }
-        return view('admin_page2.rebuild_unilevel', compact('member_gc'));
+        return view('admin_page2.rebuild_unilevel', compact( 'members'));
     }
 
     private function generatePin( $number ) {

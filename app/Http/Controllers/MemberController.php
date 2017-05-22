@@ -391,6 +391,20 @@ class MemberController extends Controller
                 ];
                 MemberCredit::create($tran_data);
             }
+
+            $months_plus_1 = date('Y-m-d', strtotime("+1 month", strtotime($member->created_at)));
+            MemberUnilevelEarning::create([
+                'woh_member' => $member->woh_member,
+                'period_cover_start' => $member->created_at,
+                'period_cover_end' => $months_plus_1,
+                'level1_earn' => 0,
+                'level5_earn' => 0,
+                'level2_earn' => 0,
+                'level3_earn' => 0,
+                'level4_earn' => 0,
+                'status' => 0
+            ]);
+
             return response(['msg' => 'Login Successfull', 'woh_member'=>$member->woh_member], 200) // 200 Status Code: Standard response for successful HTTP request
             ->header('Content-Type', 'application/json');
         }

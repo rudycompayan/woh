@@ -19,6 +19,15 @@
                                                 <form action="{{action('AdminController@post_build_unilevel_calendar')}}" method="post" style="width: 100%">
                                                     <div class="login-fields">
                                                         <div class="field">
+                                                            <select name="woh_member_list">
+                                                                <option value="-1">All Members</option>
+                                                                <option value="-2">New Members</option>
+                                                                @if(!empty($members))
+                                                                    @foreach($members as $m)
+                                                                        <option value="{{ $m['woh_member'] }}">{{ $m['username']." - ".$m['first_name'].' '. $m['last_name'] }}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
                                                             <br>
                                                             <input type="text" id="firstname" name="max_month" tabindex="4" value="" placeholder="Max months" class="login" />
                                                         </div> <!-- /field -->
