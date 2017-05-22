@@ -33,6 +33,44 @@ class MemberController extends Controller
         $downlines = $this->downline($member[0]->woh_member);
         $downlines = $downlines ? $downlines : '';
         $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->where('status',0)->get()->toArray();
+
+        $unilevel_period_id = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->get(['woh_member_unilevel_earning'])->toArray();
+        if(!empty($unilevel_period_id)) :
+            $period_cover_count = Unilevel::where('woh_member_unilevel_earning', $unilevel_period_id[0]['woh_member_unilevel_earning'])->count();
+            if($period_cover_count > 3)
+            {
+                MemberUnilevelEarning::find($unilevel_period_id[0]['woh_member_unilevel_earning'])->update(['status'=>1]);
+                $level = [];
+                $downlines2 = Member::where('sponsor',$request->session()->get('woh_member'))->limit(10)->get(['woh_member'])->toArray();
+                if(!empty($downlines2))
+                {
+                    foreach($downlines2 as $dl)
+                    {
+                        $level[1][] = $dl['woh_member'];
+                    }
+                    $x=1;
+                    while(!empty($level[$x]))
+                    {
+                        $level[] = $this->unilevel_dp($level[$x], $x);
+                        $x++;
+                    }
+                }
+                if(!empty($level))
+                {
+                    $period_covers = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('woh_member_unilevel_earning', $unilevel_period_id[0]['woh_member_unilevel_earning'])->get()->toArray();
+                    for($i=1; $i<= 5; $i++)
+                    {
+                        if(!empty($level[$i]))
+                        {
+                            $level_count = MemberUnilevelEarning::whereIn('woh_member',$level[$i])
+                                ->whereBetween('period_cover_start', [$period_covers[0]['period_cover_start'], $period_covers[0]['period_cover_end']])
+                                ->where('status',1)->count();
+                            MemberUnilevelEarning::where('woh_member_unilevel_earning',$unilevel_period_id[0]['woh_member_unilevel_earning'])->update(['level'.$i.'_earn'=>(($level_count * 2000) * ($i<=2 ? .007 : .001))]);
+                        }
+                    }
+                }
+            }
+        endif;
         return view('member_page.member_profile', compact('member', 'downlines', 'member_heads','unilevel_period'));
     }
 
@@ -542,11 +580,11 @@ class MemberController extends Controller
             $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))
                 ->groupBy('woh_member')
                 ->select([
-                            DB::raw('SUM(level1_earn) AS level1_earn'),
-                            DB::raw('SUM(level2_earn) AS level2_earn'),
-                            DB::raw('SUM(level3_earn) AS level3_earn'),
-                            DB::raw('SUM(level4_earn) AS level4_earn'),
-                            DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
+                    DB::raw('SUM(level1_earn) AS level1_earn'),
+                    DB::raw('SUM(level2_earn) AS level2_earn'),
+                    DB::raw('SUM(level3_earn) AS level3_earn'),
+                    DB::raw('SUM(level4_earn) AS level4_earn'),
+                    DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
             if(!empty($unilevel_period))
             {
                 for($x=1; $x<=5; $x++)
@@ -566,7 +604,7 @@ class MemberController extends Controller
                 }
             }
         }
-        $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->where('woh_gc', '>', 0)->sum('gc_qty');
+        $member_gc_claim = MemberGC::where('woh_member',$request->session()->get('woh_member'))->sum('gc_qty');
         $unilevel_period = MemberUnilevelEarning::where('woh_member',$request->session()->get('woh_member'))->where('period_cover_end', '>', Carbon::now())->where('period_cover_start','<=',Carbon::now())->where('status',0)->get()->toArray();
         return view('member_page.member_withdrawals', compact('member_tran', 'member', 'member_credit', 'member_gc_claim', 'unilevel_period'));
     }
@@ -630,12 +668,12 @@ class MemberController extends Controller
             Unilevel::create($data);
             \DB::table('woh_short_codes')->where(['code' => $request->product_code,'type'=>5])->update(['status'=>1]);
 
-            $period_cover_count = Unilevel::where('woh_member',$request->session()->get('woh_member'))->where('woh_member_unilevel_earning', $request->period_cover)->count();
+            $period_cover_count = Unilevel::where('woh_member_unilevel_earning', $request->period_cover)->count();
             if($period_cover_count > 3)
             {
                 MemberUnilevelEarning::find($request->period_cover)->update(['status'=>1]);
                 $level = [];
-                $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->get(['woh_member'])->toArray();
+                $downlines = Member::where('sponsor',$request->session()->get('woh_member'))->limit(10)->get(['woh_member'])->toArray();
                 if(!empty($downlines))
                 {
                     foreach($downlines as $dl)
@@ -658,9 +696,8 @@ class MemberController extends Controller
                         {
                             $level_count = MemberUnilevelEarning::whereIn('woh_member',$level[$i])
                                 ->whereBetween('period_cover_start', [$period_covers[0]['period_cover_start'], $period_covers[0]['period_cover_end']])
-                                ->whereBetween('period_cover_end', [$period_covers[0]['period_cover_start'], $period_covers[0]['period_cover_end']])
                                 ->where('status',1)->count();
-                            MemberUnilevelEarning::where('woh_member_unilevel_earning',$request->period_cover)->update(['level'.$i.'_earn'=>(($level_count * 500) * ($i<=2 ? .007 : .001))]);
+                            MemberUnilevelEarning::where('woh_member_unilevel_earning',$request->period_cover)->update(['level'.$i.'_earn'=>(($level_count * 2000) * ($i<=2 ? .007 : .001))]);
                         }
                     }
                 }
@@ -701,7 +738,7 @@ class MemberController extends Controller
         {
             foreach($woh_member as $wm)
             {
-                $data = Member::where('sponsor',$wm)->get(['woh_member'])->toArray();
+                $data = Member::where('sponsor',$wm)->limit(10)->get(['woh_member'])->toArray();
                 if(!empty($data))
                 {
                     foreach($data as $d)

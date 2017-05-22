@@ -970,42 +970,30 @@ class AdminController extends Controller
                                     ];
                                 }
                             }
-                            $level = [];
-                            $member_maintenance = Unilevel::where('woh_member',$ma['woh_member'])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                            $downlines = Member::where('sponsor',$ma['woh_member'])->get(['woh_member'])->toArray();
-                            if(!empty($downlines))
+                            $unilevel_period = MemberUnilevelEarning::where('woh_member',$ma['woh_member'])
+                                ->groupBy('woh_member')
+                                ->select([
+                                    DB::raw('SUM(level1_earn) AS level1_earn'),
+                                    DB::raw('SUM(level2_earn) AS level2_earn'),
+                                    DB::raw('SUM(level3_earn) AS level3_earn'),
+                                    DB::raw('SUM(level4_earn) AS level4_earn'),
+                                    DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
+                            if(!empty($unilevel_period))
                             {
-                                foreach($downlines as $dl)
+                                for($x=1; $x<=5; $x++)
                                 {
-                                    $level[1][] = $dl['woh_member'];
-                                }
-                                $x=1;
-                                while(!empty($level[$x]))
-                                {
-                                    $level[] = $this->unilevel_dp($level[$x], $x);
-                                    $x++;
-                                }
-                            }
-                            if(!empty($level))
-                            {
-                                for($i=1; $i<= count($level); $i++)
-                                {
-                                    if(!empty($level[$i]))
-                                    {
-                                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                                        $member_tran[] = [
-                                            "woh_member_transaction" => "----------",
-                                            "woh_member" => null,
-                                            "woh_transaction_type" => 8,
-                                            "transaction_date" => Carbon::now(),
-                                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
-                                            "transaction_referred" => null,
-                                            "no_of_pairs" => null,
-                                            "status" => 1,
-                                            "transaction_type" => "Unilevel Earnings",
-                                            "level" => $i
-                                        ];
-                                    }
+                                    $member_tran[] = [
+                                        "woh_member_transaction" => "----------",
+                                        "woh_member" => null,
+                                        "woh_transaction_type" => 8,
+                                        "transaction_date" => Carbon::now(),
+                                        "tran_amount" =>  $unilevel_period[0]['level'.$x.'_earn'],
+                                        "transaction_referred" => null,
+                                        "no_of_pairs" => null,
+                                        "status" => 1,
+                                        "transaction_type" => "Unilevel Earnings",
+                                        "level" => $x
+                                    ];
                                 }
                             }
                             $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
@@ -1094,42 +1082,30 @@ class AdminController extends Controller
                                     ];
                                 }
                             }
-                            $level = [];
-                            $member_maintenance = Unilevel::where('woh_member',$ma['woh_member'])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                            $downlines = Member::where('sponsor',$ma['woh_member'])->get(['woh_member'])->toArray();
-                            if(!empty($downlines))
+                            $unilevel_period = MemberUnilevelEarning::where('woh_member',$ma['woh_member'])
+                                ->groupBy('woh_member')
+                                ->select([
+                                    DB::raw('SUM(level1_earn) AS level1_earn'),
+                                    DB::raw('SUM(level2_earn) AS level2_earn'),
+                                    DB::raw('SUM(level3_earn) AS level3_earn'),
+                                    DB::raw('SUM(level4_earn) AS level4_earn'),
+                                    DB::raw('SUM(level5_earn) AS level5_earn')])->get()->toArray();
+                            if(!empty($unilevel_period))
                             {
-                                foreach($downlines as $dl)
+                                for($x=1; $x<=5; $x++)
                                 {
-                                    $level[1][] = $dl['woh_member'];
-                                }
-                                $x=1;
-                                while(!empty($level[$x]))
-                                {
-                                    $level[] = $this->unilevel_dp($level[$x], $x);
-                                    $x++;
-                                }
-                            }
-                            if(!empty($level))
-                            {
-                                for($i=1; $i<= count($level); $i++)
-                                {
-                                    if(!empty($level[$i]))
-                                    {
-                                        $level_count = Unilevel::whereIn('woh_member',$level[$i])->where('date_encoded','>=', $member[0]->created_at)->where('date_encoded','<=', date('Y-m-d', strtotime("+1 month", strtotime($member[0]->created_at))))->count();
-                                        $member_tran[] = [
-                                            "woh_member_transaction" => "----------",
-                                            "woh_member" => null,
-                                            "woh_transaction_type" => 8,
-                                            "transaction_date" => Carbon::now(),
-                                            "tran_amount" =>  (!$member_maintenance || $member_maintenance && $member_maintenance < 4)? 0 : (($level_count * 500) * ($i<=2 ? .007 : .001)),
-                                            "transaction_referred" => null,
-                                            "no_of_pairs" => null,
-                                            "status" => 1,
-                                            "transaction_type" => "Unilevel Earnings",
-                                            "level" => $i
-                                        ];
-                                    }
+                                    $member_tran[] = [
+                                        "woh_member_transaction" => "----------",
+                                        "woh_member" => null,
+                                        "woh_transaction_type" => 8,
+                                        "transaction_date" => Carbon::now(),
+                                        "tran_amount" =>  $unilevel_period[0]['level'.$x.'_earn'],
+                                        "transaction_referred" => null,
+                                        "no_of_pairs" => null,
+                                        "status" => 1,
+                                        "transaction_type" => "Unilevel Earnings",
+                                        "level" => $x
+                                    ];
                                 }
                             }
                             $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
