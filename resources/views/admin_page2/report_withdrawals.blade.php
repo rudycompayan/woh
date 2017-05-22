@@ -6,13 +6,14 @@
             <div class="container">
                 <div class="row">
                     <div class="span12">
-                        <div class="widget widget-table action-table">
+                        <div class="widget widget-table action-table" id="print-element">
                             <form action="{{action('AdminController@post_filter_report_withdrawals')}}" method="post">
                             <div class="widget-header"> <i class="icon-th-list"></i>
                                 <h3>Member's Withdrawal Report</h3>
                                 From: <input type="text" id="start_date" style="margin-top: 6px;" name="start_date" value="{{ $start_date ? \Carbon\Carbon::parse($start_date)->format('m/d/Y') : '' }}"> To:
                                 <input type="text" id="end_date" style="margin-top: 6px;" name="end_date" value="{{ $end_date ? \Carbon\Carbon::parse($end_date)->format('m/d/Y') : '' }}">
                                 <input type="submit" value="Filter Results" style="margin-top: 6px;" name="submit">
+                                <input type="submit" value="Print Report" style="margin-top: 6px;" name="print" id="print">
                             </div>
                             </form>
                             <!-- /widget-header -->
@@ -116,6 +117,10 @@
         $(document).ready(function(){
             $( "#start_date" ).datepicker();
             $( "#end_date" ).datepicker();
+            $("#print").click(function(e){
+                e.preventDefault();
+                printContent2('print-element');
+            });
         });
     </script>
 @endsection

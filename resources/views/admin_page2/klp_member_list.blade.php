@@ -6,14 +6,13 @@
         <div class="container">
             <div class="row">
                 <div class="span12">
-                    <div class="widget widget-table action-table">
+                    <div class="widget widget-table action-table"  id="print-element">
                         <div class="widget-header"> <i class="icon-th-list"></i>
                             <h3>KLP Members List Report</h3>
-                            From: <input type="text" id="start_date" style="margin-top: 6px;"> To:
-                            <input type="text" id="end_date" style="margin-top: 6px;">
+                            <input type="submit" value="Print Report" style="margin-top: 6px;" name="print" id="print">
                         </div>
                         <!-- /widget-header -->
-                        <div class="widget-content"   style="overflow: scroll; max-height: 500px">
+                        <div class="widget-content">
                             <table class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
@@ -76,6 +75,10 @@
     $(document).ready(function(){
         $( "#start_date" ).datepicker();
         $( "#end_date" ).datepicker();
+        $("#print").click(function(e){
+            e.preventDefault();
+            printContent2('print-element');
+        });
     });
 </script>
 @endsection

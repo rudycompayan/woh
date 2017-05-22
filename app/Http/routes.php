@@ -43,6 +43,8 @@ Route::get('/admin_reports_redeemed_gc', 'AdminController@report_redeemed_gc');
 Route::get('/ssssss-hhhhh-wwwwww--dbxxxx_xxxxbackupxxxx---setttingssxxxxx', 'AdminController@db_backup');
 Route::get('/gc_claim_request', 'AdminController@gc_claim_request');
 Route::get('/admin_build_unilevel_calendar', 'AdminController@build_unilevel_calendar');
+Route::get('/admin_reports_gc_withdrawals', 'AdminController@report_gc_withdrawals');
+Route::get('/admin_reports_pairing_bonus', 'AdminController@report_pairing_bonus');
 
 Route::post('/admin_login', 'AdminController@post_admin_login');
 Route::post('/short_codes', 'AdminController@post_short_codes');
@@ -61,6 +63,8 @@ Route::post('/admin_reports_unilevel_filter', 'AdminController@post_filter_unile
 Route::post('/admin_reports_redeemed_gc_filter', 'AdminController@post_filter_redeemed_gc');
 Route::post('/gc_claim_request', 'AdminController@post_gc_claim_request');
 Route::post('/admin_build_unilevel_calendar', 'AdminController@post_build_unilevel_calendar');
+Route::post('/admin_reports_gc_withdrawals', 'AdminController@post_filter_gc_withdrawals');
+Route::post('/admin_reports_pairing_bonus', 'AdminController@post_filter_pairing_bonus');
 
 Route::get('/member_profile', 'MemberController@member_profile');
 Route::get('/member_profile/logout', 'MemberController@member_logout');

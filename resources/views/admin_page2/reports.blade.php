@@ -45,6 +45,14 @@
                                         <i class="shortcut-icon icon-picture"></i>
                                         <span class="shortcut-label">Redeemed Gift Certificates</span>
                                     </a>
+                                    <a href="{{action('AdminController@report_gc_withdrawals')}}" class="shortcut" style="float: left">
+                                        <i class="shortcut-icon icon-picture"></i>
+                                        <span class="shortcut-label">GC Withdrawals</span>
+                                    </a>
+                                    <a href="{{action('AdminController@report_pairing_bonus')}}" class="shortcut" style="float: left">
+                                        <i class="shortcut-icon icon-picture"></i>
+                                        <span class="shortcut-label">Pairing Bonus</span>
+                                    </a>
                                 </div>
                                 <!-- /shortcuts -->
                             </div>

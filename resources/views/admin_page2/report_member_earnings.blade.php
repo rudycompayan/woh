@@ -6,16 +6,17 @@
             <div class="container">
                 <div class="row">
                     <div class="span12">
-                        <div class="widget widget-table action-table">
+                        <div class="widget widget-table action-table"  id="print-element">
                             <form action="{{action('AdminController@post_filter_member_earnings')}}" method="post">
                                 <div class="widget-header"> <i class="icon-th-list"></i>
                                     <h3>Member Earnings Report</h3>
                                     <input type="text" style="margin-top: 6px;" name="name" placeholder="Search here..." value="{{ $name }}">
                                     <input type="submit" value="Search" style="margin-top: 6px;" name="submit">
+                                    <input type="submit" value="Print Report" style="margin-top: 6px;" name="print" id="print">
                                 </div>
                             </form>
                             <!-- /widget-header -->
-                            <div class="widget-content"   style="overflow: scroll; max-height: 500px">
+                            <div class="widget-content">
                                 <table class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
@@ -104,6 +105,10 @@
         $(document).ready(function(){
             $( "#start_date" ).datepicker();
             $( "#end_date" ).datepicker();
+            $("#print").click(function(e){
+                e.preventDefault();
+                printContent2('print-element');
+            });
         });
     </script>
 @endsection

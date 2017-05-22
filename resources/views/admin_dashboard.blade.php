@@ -99,5 +99,20 @@
 <!-- /footer -->
 <!-- Le javascript
 ================================================== -->
+<script type="text/javascript">
+    function printContent2(div_id)
+    {
+        var content = document.getElementById(div_id);
+        var map_src = window.open("", "PRINT MAP", "width=800,height=600,top=0,left=0,toolbar=no,scrollbars=no,status=no,resizable=no");
+        map_src.document.write('<html><head>');
+        //map_src.document.write('<link rel="stylesheet"  href="/leaflet-0.5.1/0.7.3/leaflet.css"/>'); ** Remove this line
+        map_src.document.write("</head><body><div style='height:400px; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif'>");
+        map_src.document.write(content.innerHTML);
+        map_src.document.write('</div></body></html>');
+        map_src.document.close();
+        map_src.focus();
+        map_src.print();
+    }
+</script>
 </body>
 </html>

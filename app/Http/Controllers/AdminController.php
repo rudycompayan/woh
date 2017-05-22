@@ -1379,6 +1379,223 @@ class AdminController extends Controller
         return view('admin_page2.rebuild_unilevel', compact( 'members'));
     }
 
+    public function report_gc_withdrawals(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = "";
+                $gc = MemberGC::join('woh_gc', 'woh_member_gc.woh_gc','=','woh_gc.woh_gc')->orderBy('date_claim','DESC')->get()->toArray();
+            }
+        }
+        return view('admin_page2.report_gc_withdrawals', compact('gc', 'name'));
+    }
+
+    public function post_filter_gc_withdrawals(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = $request->name;
+                $gc = MemberGC::join('woh_gc', 'woh_member_gc.woh_gc','=','woh_gc.woh_gc')->where(function ($query) use($name){
+                    $query->where('to','like','%'.$name.'%')->orWhere('bar_code','like','%'.$name.'%');
+                })->orderBy('date_claim','DESC')->get()->toArray();
+            }
+        }
+        return view('admin_page2.report_gc_withdrawals', compact('gc', 'name'));
+    }
+
+    public function report_pairing_bonus(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = "";
+                $member_all = new Member;
+                $member_all = $member_all->orderBy('first_name','ASC')->get()->toArray();
+                $all_report = [];
+                if(!empty($member_all))
+                {
+                    foreach ($member_all as $ma)
+                    {
+                        $level_arr = [];
+                        $member = new Member;
+                        $member = $member->where('woh_member',$ma['woh_member'])->get();
+
+                        $member_tran = [];
+                        $level_pair = new DownlineLevel;
+                        $level = $level_pair->where(['parent_member'=>$ma['woh_member']])->max('level');
+
+                        if($level > 0)
+                        {
+                            for($x=2; $x<=$level; $x++)
+                            {
+                                $total_counts_left = $total_counts_right = 0;
+                                $level_pair_main_left_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'left', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                                $level_pair_main_left_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'left', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                                $level_pair_main_right_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'right', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                                $level_pair_main_right_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'right', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                                if(!empty($level_pair_main_left_sub_left) && !empty($level_pair_main_right_sub_right))
+                                    $total_counts_left = count($level_pair_main_left_sub_left) > 3 ? 3 : count($level_pair_main_right_sub_right);
+
+                                if(!empty($level_pair_main_left_sub_right) && !empty($level_pair_main_right_sub_left))
+                                    $total_counts_right = count($level_pair_main_left_sub_right) > 3 ? 3 : count($level_pair_main_right_sub_left);
+
+                                if($total_counts_left > 0 || $total_counts_right > 0)
+                                {
+                                    $total_counts = ($total_counts_left + $total_counts_right > 3) ? 3 : ($total_counts_left + $total_counts_right);
+                                    $member_tran[] = [
+                                        "woh_member_transaction" => "----------",
+                                        "woh_member" => null,
+                                        "woh_transaction_type" => ($x%5==0) ? 4 : 5,
+                                        "transaction_date" => Carbon::now(),
+                                        "tran_amount" => ($x%5==0) ? 300 : ($total_counts * 100),
+                                        "transaction_referred" => null,
+                                        "no_of_pairs" => null,
+                                        "status" => 1,
+                                        "transaction_type" => ($x%5==0) ? "GC worth 300 pesos" : "Level Pair",
+                                        "level" => $x
+                                    ];
+                                }
+                            }
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
+                        }
+                        else
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = [];
+                    }
+                }
+            }
+        }
+        return view('admin_page2.report_pairing_bonus', compact('all_report', 'name'));
+    }
+
+    public function post_filter_pairing_bonus(Request $request)
+    {
+        if(!$request->session()->get('woh_admin_user'))
+        {
+            $redirect = action('HomepageController@index');
+            return redirect($redirect);
+        }
+        else
+        {
+            $admin = $request->session()->get('woh_admin_user');
+            if($admin[0]['user_type'] == 'cashier')
+                return redirect(action('AdminController@redeem_gc'));
+            elseif($admin[0]['user_type'] == 'controller')
+                return redirect(action('AdminController@gc_set'));
+            elseif($admin[0]['user_type'] == 'accounting')
+                return redirect(action('AdminController@gift_certificates'));
+            else
+            {
+                $name = $request->name;
+                $member_all = new Member;
+                $member_all = $member_all->where('first_name','like','%'.$name.'%')->orWhere('last_name','like','%'.$name.'%')->orWhere('username','like','%'.$name.'%')->orWhere('woh_member','like','%'.$name.'%')->orderBy('first_name','ASC')->get()->toArray();
+                $all_report = [];
+                if(!empty($member_all))
+                {
+                    foreach ($member_all as $ma)
+                    {
+                        $level_arr = [];
+                        $member = new Member;
+                        $member = $member->where('woh_member',$ma['woh_member'])->get();
+                        $member_tran = [];
+                        $level_pair = new DownlineLevel;
+                        $level = $level_pair->where(['parent_member'=>$ma['woh_member']])->max('level');
+
+                        if($level > 0)
+                        {
+                            for($x=2; $x<=$level; $x++)
+                            {
+                                $total_counts_left = $total_counts_right = 0;
+                                $level_pair_main_left_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'left', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                                $level_pair_main_left_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'left', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                                $level_pair_main_right_sub_left = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'right', 'sub_position'=>'left', 'level' => $x])->get()->toArray();
+                                $level_pair_main_right_sub_right = $level_pair->join('woh_transaction_type', 'woh_downline_level.woh_transaction_type', '=', 'woh_transaction_type.woh_transaction_type')
+                                    ->where(['parent_member'=>$ma['woh_member'], 'main_position'=>'right', 'sub_position'=>'right', 'level' => $x])->get()->toArray();
+
+                                if(!empty($level_pair_main_left_sub_left) && !empty($level_pair_main_right_sub_right))
+                                    $total_counts_left = count($level_pair_main_left_sub_left) > 3 ? 3 : count($level_pair_main_right_sub_right);
+
+                                if(!empty($level_pair_main_left_sub_right) && !empty($level_pair_main_right_sub_left))
+                                    $total_counts_right = count($level_pair_main_left_sub_right) > 3 ? 3 : count($level_pair_main_right_sub_left);
+
+                                if($total_counts_left > 0 || $total_counts_right > 0)
+                                {
+                                    $total_counts = ($total_counts_left + $total_counts_right > 3) ? 3 : ($total_counts_left + $total_counts_right);
+                                    $member_tran[] = [
+                                        "woh_member_transaction" => "----------",
+                                        "woh_member" => null,
+                                        "woh_transaction_type" => ($x%5==0) ? 4 : 5,
+                                        "transaction_date" => Carbon::now(),
+                                        "tran_amount" => ($x%5==0) ? 300 : ($total_counts * 100),
+                                        "transaction_referred" => null,
+                                        "no_of_pairs" => null,
+                                        "status" => 1,
+                                        "transaction_type" => ($x%5==0) ? "GC worth 300 pesos" : "Level Pair",
+                                        "level" => $x
+                                    ];
+                                }
+                            }
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = $member_tran;
+                        }
+                        else
+                            $all_report[$ma['woh_member'].' - '.$ma['first_name'].' "'.$ma['username'].'" '.$ma['last_name']][] = [];
+                    }
+                }
+            }
+        }
+        return view('admin_page2.report_pairing_bonus', compact('all_report', 'name'));
+    }
+
     private function generatePin( $number ) {
         // Generate set of alpha characters
         $alpha = array();
